@@ -10,12 +10,5 @@ Packages/
 *.userprefs
 *.unityproj
 *.DS_Store
-Library/ArtifactDB
-Library/Artifacts/27/278038e5f97d2544d11bf027a3e09a65
-Library/Bee/TundraBuildState.state
-Library/Bee/TundraBuildState.state.map
-Library/Bee/artifacts/1900b0aEDbg.dag/Assembly-CSharp.dll
-Library/Bee/artifacts/1900b0aEDbg.dag/Assembly-CSharp.pdb
-Library/Bee/artifacts/1900b0aEDbg.dag/Assembly-CSharp.ref.dll
-Library/Bee/artifacts/1900b0aEDbg.dag/post-processed/Assembly-CSharp.dll
-Library/Bee/artifacts/1900b0aEDbg.dag/post-processed/Assembly-CSharp.pdb
+
+
