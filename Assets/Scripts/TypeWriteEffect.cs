@@ -23,10 +23,10 @@ public class TypeWriteEffect : MonoBehaviour
             StopCoroutine(typingCoroutine);
         }
 
-        typingCoroutine = StartCoroutine(TypeLine(text));
+        typingCoroutine = StartCoroutine(typeLineCor(text));
     }
 
-    private IEnumerator TypeLine(string text)  
+    private IEnumerator typeLineCor(string text)  
     {
         isTyping = true;
         textDisplay.text = text;
