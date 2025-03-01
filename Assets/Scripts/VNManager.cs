@@ -15,12 +15,15 @@ public class VNManager : MonoBehaviour
 
     public TypeWriteEffect typeWriterEffect;
 
-    public Image avatorImage;
-    public AudioSource vocalAudio;
+    public Image avatorImage;               //Õ∑œÒÕº∆¨
+    public AudioSource vocalAudio;          //»À…˘
+
+    public Image backgroundImage;           //±≥æ∞Õº∆¨
+    public AudioSource backgroundMusic;     //±≥æ∞“Ù¿÷
       
     private List<ExcelReader.ExcelData> storyData;
 
-    private int currentLine = 0;
+    private int currentLine = Constants.DEFAULT_START_LINE;
 
     void Start()
     {
@@ -86,6 +89,16 @@ public class VNManager : MonoBehaviour
             PlayerVocalAudio(data.vocalAudioFileName);
         }
 
+        if(NotNullOrEmpty(data.bgImageFileName))
+        {
+            UpdateBackgroundImage(data.bgImageFileName);
+        }
+
+        if(NotNullOrEmpty(data.bgMusicFileName))
+        {
+            PlayBackgroundMusic(data.bgMusicFileName);
+        }
+
         currentLine++;
     }
 
@@ -104,7 +117,6 @@ public class VNManager : MonoBehaviour
         }
     }
     
-
     private void PlayerVocalAudio(string audioFileName)
     {
         string audioPath = Constants.VOCAL_PATH + audioFileName;
@@ -120,6 +132,37 @@ public class VNManager : MonoBehaviour
         }
     }
 
-    private bool NotNullOrEmpty(string str) => !string.IsNullOrEmpty(str);
     
+    
+    private void UpdateBackgroundImage(string bgImageFileName)
+    {
+        string bgImagePath = Constants.BACKGROUND_PATH + bgImageFileName;
+        Sprite bgSprite = Resources.Load<Sprite>(bgImagePath);
+        if(bgSprite != null)
+        {
+            backgroundImage.sprite = bgSprite;
+        }
+        else
+        {
+            Debug.LogError(Constants.IMAGE_LOAD_FAILED + bgImagePath);
+        }
+    }
+
+    private void PlayBackgroundMusic(string bgMusicFileName)
+    {
+        string bgMusicPath = Constants.MUSIC_PATH + bgMusicFileName;
+        AudioClip bgMusicClip = Resources.Load<AudioClip>(bgMusicPath);
+        if(bgMusicClip != null)
+        {
+            backgroundMusic.clip = bgMusicClip;
+            backgroundMusic.Play();
+            backgroundMusic.loop = true;
+        }
+        else
+        {
+            Debug.LogError(Constants.MUSIC_LOAD_FAILED + bgMusicPath);
+        }
+    }
+
+    private bool NotNullOrEmpty(string str) => !string.IsNullOrEmpty(str);
 }
