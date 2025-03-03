@@ -664,6 +664,9 @@ MonoBehaviour:
   vocalAudio: {fileID: 236187118}
   backgroundImage: {fileID: 1643702835}
   backgroundMusic: {fileID: 435923171}
+  characterImage:
+  - {fileID: 2100226048}
+  - {fileID: 1929053311}
 --- !u!4 &645197600
 Transform:
   m_ObjectHideFlags: 0

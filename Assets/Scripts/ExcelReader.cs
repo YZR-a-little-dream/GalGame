@@ -13,8 +13,12 @@ public class ExcelReader : MonoBehaviour
         public string SpeakingContent;
         public string avatorImageFileName;
         public string vocalAudioFileName;
-        public string bgImageFileName;  //±≥æ∞Õº∆¨
-        public string bgMusicFileName;  //±≥æ∞“Ù¿÷
+        public string bgImageFileName;          //±≥æ∞Õº∆¨
+        public string bgMusicFileName;          //±≥æ∞“Ù¿÷
+
+        public int characterNum;                //Ω«…´±‡∫≈
+        public string characterAction;          //Ω«…´Œª÷√
+        public string characterImgFileName;     //Ω«…´¡¢ªÊ
     }
 
     public static List<ExcelData> ReadExcel(string filepath)
@@ -30,6 +34,7 @@ public class ExcelReader : MonoBehaviour
                 {
                     while(reader.Read())
                     {
+                        int num = 0;
                         ExcelData data = new ExcelData();
                         data.speakerName = reader.IsDBNull(0) ? string.Empty : reader.GetValue(0)?.ToString();
                         data.SpeakingContent = reader.IsDBNull(1) ? string.Empty : reader.GetValue(1)?.ToString();
@@ -37,6 +42,11 @@ public class ExcelReader : MonoBehaviour
                         data.vocalAudioFileName = reader.IsDBNull(3) ? string.Empty : reader.GetValue(3)?.ToString();
                         data.bgImageFileName = reader.IsDBNull(4) ? string.Empty : reader.GetValue(4)?.ToString();
                         data.bgMusicFileName = reader.IsDBNull(5) ? string.Empty : reader.GetValue(5)?.ToString();
+                        data.characterNum = reader.IsDBNull(6) ? 
+                        0 : 
+                        int.TryParse(reader.GetValue(6)?.ToString() , out num) ? num : Constants.DEFAULT_UNEXiST_NUMBER;
+                        data.characterAction = reader.IsDBNull(7) ? string.Empty : reader.GetValue(7)?.ToString();
+                        data.characterImgFileName = reader.IsDBNull(8) ? string.Empty : reader.GetValue(8)?.ToString();
                         excelData.Add(data);
                     }
                 }while(reader.NextResult());

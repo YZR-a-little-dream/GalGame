@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using JetBrains.Annotations;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -20,6 +21,8 @@ public class VNManager : MonoBehaviour
 
     public Image backgroundImage;           //±³¾°Í¼Æ¬
     public AudioSource backgroundMusic;     //±³¾°ÒôÀÖ
+
+    public Image[] characterImage;            //½ÇÉ«Á¢»æÁÐ±í
       
     private List<ExcelReader.ExcelData> storyData;
 
@@ -99,68 +102,93 @@ public class VNManager : MonoBehaviour
             PlayBackgroundMusic(data.bgMusicFileName);
         }
 
+        if(NotNullOrEmpty(data.characterAction))
+        {
+            if(data.characterNum != Constants.DEFAULT_UNEXiST_NUMBER)
+            {
+                UpdateCharacterImage( data.characterAction, data.characterImgFileName,characterImage[data.characterNum]);
+            }
+        }
+
         currentLine++;
     }
 
     private void UpdateAvatarImage(string imageFileName)
     {
-        string imagepath = Constants.AVATAR_PATH + imageFileName;
-        Sprite sprite = Resources.Load<Sprite>(imagepath);
-        if(sprite != null)
-        {
-            avatorImage.sprite = sprite;
-            avatorImage.gameObject.SetActive(true);
-        }
-        else
-        {
-            Debug.LogError(Constants.IMAGE_LOAD_FAILED + imagepath);
-        }
-    }
-    
-    private void PlayerVocalAudio(string audioFileName)
-    {
-        string audioPath = Constants.VOCAL_PATH + audioFileName;
-        AudioClip audioClip = Resources.Load<AudioClip>(audioPath);
-        if(audioClip != null)
-        {
-            vocalAudio.clip = audioClip;
-            vocalAudio.Play();
-        }
-        else
-        {
-            Debug.LogError(Constants.AUDIO_LOAD_FAILED + audioPath);
-        }
+        string avatarImagepath = Constants.AVATAR_PATH + imageFileName;
+        UpdateImage(avatarImagepath,avatorImage);
     }
 
-    
-    
     private void UpdateBackgroundImage(string bgImageFileName)
     {
         string bgImagePath = Constants.BACKGROUND_PATH + bgImageFileName;
-        Sprite bgSprite = Resources.Load<Sprite>(bgImagePath);
-        if(bgSprite != null)
+        UpdateImage(bgImagePath,backgroundImage);
+    }
+    
+    private void UpdateCharacterImage( string Action, string imageFileName, Image characterImage)
+    {
+        if(Action.StartsWith(Constants.CHARACTERACTION_APPEARAT))
         {
-            backgroundImage.sprite = bgSprite;
+            string imagePath = Constants.CHARACTER_PATH + imageFileName;
+            UpdateImage(imagePath,characterImage);
+        }
+        else if(Action.StartsWith(Constants.CHARACTERACTION_DISAPPEAR))
+        {
+            //Òþ²Ø½ÇÉ«Á¢»æ
+            characterImage.gameObject.SetActive(false);
+            //TODO:²¥·ÅÏûÊ§¶¯»­
+        }
+        else if(Action.StartsWith(Constants.CHARACTERACTION_MOVETO))
+        {
+            //TODO:ÒÆ¶¯Á¢»æÎ»ÖÃ
+        }
+    }
+
+    private void UpdateImage(string imagePath, Image characterImg)
+    {
+        Sprite sprite = Resources.Load<Sprite>(imagePath);
+        if(sprite != null)
+        {
+            characterImg.sprite = sprite;
+            characterImg.gameObject.SetActive(true);
         }
         else
         {
-            Debug.LogError(Constants.IMAGE_LOAD_FAILED + bgImagePath);
+            Debug.LogError(Constants.IMAGE_LOAD_FAILED + imagePath);
         }
+    }
+
+    private void PlayerVocalAudio(string audioFileName)
+    {
+        string audioPath = Constants.VOCAL_PATH + audioFileName;
+        PlayAudio(audioPath,vocalAudio,false);
     }
 
     private void PlayBackgroundMusic(string bgMusicFileName)
     {
         string bgMusicPath = Constants.MUSIC_PATH + bgMusicFileName;
-        AudioClip bgMusicClip = Resources.Load<AudioClip>(bgMusicPath);
-        if(bgMusicClip != null)
+        PlayAudio(bgMusicPath,backgroundMusic,true);
+    }
+
+    private void PlayAudio(string bgMusicPath, AudioSource audioSource, bool isLoop)
+    {
+        AudioClip audioClip = Resources.Load<AudioClip>(bgMusicPath);
+        if (audioClip != null)
         {
-            backgroundMusic.clip = bgMusicClip;
-            backgroundMusic.Play();
-            backgroundMusic.loop = true;
+            audioSource.clip = audioClip;
+            audioSource.Play();
+            audioSource.loop = isLoop;
         }
         else
         {
-            Debug.LogError(Constants.MUSIC_LOAD_FAILED + bgMusicPath);
+            if(audioSource == backgroundMusic)
+            {
+                Debug.LogError(Constants.MUSIC_LOAD_FAILED + bgMusicPath);
+            }
+            else if (audioSource == vocalAudio)
+            {
+                Debug.LogError(Constants.AUDIO_LOAD_FAILED + bgMusicPath);
+            }
         }
     }
 
