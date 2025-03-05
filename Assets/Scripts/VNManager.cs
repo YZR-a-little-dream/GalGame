@@ -5,6 +5,7 @@ using JetBrains.Annotations;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using DG.Tweening;
 
 public class VNManager : MonoBehaviour
 {
@@ -30,6 +31,7 @@ public class VNManager : MonoBehaviour
 
     void Start()
     {
+        Initialize();
         loadStoryFromFile(FILEPATH);        
         displayNextLine();                  
     }
@@ -42,6 +44,16 @@ public class VNManager : MonoBehaviour
         }
     }
 
+    private void Initialize()
+    {
+        avatorImage.gameObject.SetActive(false);
+        backgroundImage.gameObject.SetActive(false);
+        foreach (var img in characterImage)
+        {
+            img.gameObject.SetActive(false);
+        }
+    }
+    
     private void loadStoryFromFile(string filepath)
     {
         storyData = ExcelReader.ReadExcel(filepath);
@@ -51,7 +63,7 @@ public class VNManager : MonoBehaviour
             Debug.LogError(Constants.NO_DATA_FOUND);
         }
     }
-        
+
 
     private void displayNextLine()
     {
@@ -127,21 +139,58 @@ public class VNManager : MonoBehaviour
     
     private void UpdateCharacterImage( string Action, string imageFileName, Image characterImage)
     {
+        
+
         if(Action.StartsWith(Constants.CHARACTERACTION_APPEARAT))
         {
-            string imagePath = Constants.CHARACTER_PATH + imageFileName;
-            UpdateImage(imagePath,characterImage);
+            float imgPositionX = CalImgPositionX(Action,
+                Constants.DEFAULT_APPEARAT_START_POSITION,
+                Constants.DEFAULT_APPEARAT_IRRELEVANT_CHAR);
+
+            if (NotLegalFloatNum(imgPositionX))
+            {
+                string imagePath = Constants.CHARACTER_PATH + imageFileName;
+                UpdateImage(imagePath, characterImage);
+                Vector2 newPosition = new Vector2(imgPositionX,
+                    characterImage.rectTransform.anchoredPosition.y);
+                characterImage.rectTransform.anchoredPosition = newPosition;
+                characterImage.DOFade(1, Constants.DEFAULT_DURATION_TIME).From(0);
+            }
+            else
+            {
+                Debug.LogError(Constants.COORDINATE_MISSING);
+            }
+
         }
         else if(Action.StartsWith(Constants.CHARACTERACTION_DISAPPEAR))
         {
-            //隐藏角色立绘
-            characterImage.gameObject.SetActive(false);
-            //TODO:播放消失动画
+            //隐藏角色立绘,播放消失动画
+            characterImage.DOFade(0,Constants.DEFAULT_DURATION_TIME).OnComplete
+                (() => characterImage.gameObject.SetActive(false));
         }
         else if(Action.StartsWith(Constants.CHARACTERACTION_MOVETO))
         {
-            //TODO:移动立绘位置
+            float imgPositionX = CalImgPositionX(Action,
+                Constants.DEFAULT_MOVETO_START_POSITION,
+                Constants.DEFAULT_MOVETO_IRRELEVANT_CHAR);
+            //移动立绘位置
+            if(NotLegalFloatNum(imgPositionX))
+            {
+                characterImage.rectTransform.DOAnchorPosX(imgPositionX, Constants.DEFAULT_DURATION_TIME);
+            }
         }
+    }
+
+    private float CalImgPositionX(string Action,int numStartPosition, int IrrelevantChar)
+    {
+        ReadOnlySpan<char> span = Action.AsSpan();
+        ReadOnlySpan<char> coordinatesSpan = span.Slice(numStartPosition,span.Length - IrrelevantChar);
+        var coordinates = coordinatesSpan.ToString().Split(',');
+
+        float _x = -1;
+        float imgPositionX = float.TryParse(coordinates[0], out _x) ? _x : -1;
+        //float y = float.Parse(coordinates[1]);
+        return imgPositionX;
     }
 
     private void UpdateImage(string imagePath, Image characterImg)
@@ -193,4 +242,6 @@ public class VNManager : MonoBehaviour
     }
 
     private bool NotNullOrEmpty(string str) => !string.IsNullOrEmpty(str);
+
+    private bool NotLegalFloatNum(float num) => num != Constants.DEFAULT_UNEXiST_NUMBER;
 }
