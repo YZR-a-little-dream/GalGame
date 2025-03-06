@@ -10,7 +10,7 @@ public class ExcelReader : MonoBehaviour
     public struct ExcelData
     {
         public string speakerName;
-        public string SpeakingContent;
+        public string speakingContent;
         public string avatorImageFileName;
         public string vocalAudioFileName;
         public string bgImageFileName;          //±³¾°Í¼Æ¬
@@ -37,7 +37,7 @@ public class ExcelReader : MonoBehaviour
                         int num = 0;
                         ExcelData data = new ExcelData();
                         data.speakerName = reader.IsDBNull(0) ? string.Empty : reader.GetValue(0)?.ToString();
-                        data.SpeakingContent = reader.IsDBNull(1) ? string.Empty : reader.GetValue(1)?.ToString();
+                        data.speakingContent = reader.IsDBNull(1) ? string.Empty : reader.GetValue(1)?.ToString();
                         data.avatorImageFileName = reader.IsDBNull(2) ? string.Empty : reader.GetValue(2)?.ToString();
                         data.vocalAudioFileName = reader.IsDBNull(3) ? string.Empty : reader.GetValue(3)?.ToString();
                         data.bgImageFileName = reader.IsDBNull(4) ? string.Empty : reader.GetValue(4)?.ToString();
