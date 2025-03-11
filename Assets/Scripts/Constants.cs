@@ -3,6 +3,7 @@ using UnityEngine;
 public class Constants : MonoBehaviour
 {   
     public static float DEFAULT_WAITING_SECONDS = 0.05f;
+    public static float DEFAULT_SKIP_MODE_TYPING_SPEED = 0.01f;
     public static int DEFAULT_START_LINE = 1;
     public static int DEFAULT_UNEXiST_NUMBER = -1;
 
@@ -13,6 +14,7 @@ public class Constants : MonoBehaviour
     public static string BACKGROUND_PATH = "image/background/";
     public static string AVATAR_PATH = "image/avatar/";
     public static string CHARACTER_PATH = "image/character/";
+    public static string BUTTON_PATH = "image/button/";
     public static string VOCAL_PATH = "audio/vocal/";
     public static string MUSIC_PATH = "audio/music/";
     
@@ -35,4 +37,8 @@ public class Constants : MonoBehaviour
     public static int DEFAULT_MOVETO_IRRELEVANT_CHAR = 8;       //无关字符数量为8，只读取（x，y）的长度
     public static int DEFAULT_DURATION_TIME = 1;                    //动画持续时间为1秒
     public static string COORDINATE_MISSING = "Coordinate missing";
+
+    public static string AUTO_ON = "autoplayon";
+    public static string AUTO_OFF = "autoplayoff";
+    
 }

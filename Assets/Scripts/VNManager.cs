@@ -30,7 +30,11 @@ public class VNManager : MonoBehaviour
     public GameObject choicePanel;
     public Button choiceButton1;
     public Button choiceButton2;
-    
+
+    //右下角的控制按钮
+    public GameObject bottomButtonsPanel;
+    public Button autoButton;    
+    private bool isAutoPlay = false;
 
     void Start()
     {
@@ -41,7 +45,10 @@ public class VNManager : MonoBehaviour
     {
         if(Input.GetMouseButtonDown(0))
         {
-            displayNextLine();
+            if(!IsHittingBottomButtons())
+            {
+                DisplayNextLine();
+            }
         }
     }
 
@@ -49,7 +56,7 @@ public class VNManager : MonoBehaviour
     {
         Initialize();
         loadStoryFromFile(defaultStoryFileName);
-        displayNextLine();
+        DisplayNextLine();
     }
 
     private void Initialize()
@@ -62,8 +69,10 @@ public class VNManager : MonoBehaviour
             img.gameObject.SetActive(false);
         }
         choicePanel.SetActive(false);
+
+        autoButton.onClick.AddListener(OnAutoButtonClick);
     }
-    
+
     private void loadStoryFromFile(string fileName)
     {
         string path = Constants.STORY_PATH + fileName + Constants.DEFAULT_FILE_EXTENSION;
@@ -75,8 +84,7 @@ public class VNManager : MonoBehaviour
         }
     }
 
-
-    private void displayNextLine()
+    private void DisplayNextLine()
     {
         if(currentLine == storyData.Count - 1)
         {
@@ -233,6 +241,11 @@ public class VNManager : MonoBehaviour
         return imgPositionX;
     }
 
+    /// <summary>
+    /// 更新图片
+    /// </summary>
+    /// <param name="imagePath">图片资源路径</param>
+    /// <param name="characterImg">需要更新的图片组件</param>
     private void UpdateImage(string imagePath, Image characterImg)
     {
         Sprite sprite = Resources.Load<Sprite>(imagePath);
@@ -290,4 +303,41 @@ public class VNManager : MonoBehaviour
 
     private bool NotLegalFloatNum(float num) => num != Constants.DEFAULT_UNEXiST_NUMBER;
     #endregion
+
+    private bool IsHittingBottomButtons()
+    {
+        return RectTransformUtility.RectangleContainsScreenPoint(
+            bottomButtonsPanel.GetComponent<RectTransform>(),
+            Input.mousePosition,
+            null
+        );
+    }
+
+    private void OnAutoButtonClick()
+    {
+        isAutoPlay = !isAutoPlay;
+        UpdateButtonImage((isAutoPlay? Constants.AUTO_ON:Constants.AUTO_OFF),autoButton);
+        if(isAutoPlay)
+        {
+            StartCoroutine(StartAutoPlay());
+        }
+    }
+
+    private void UpdateButtonImage(string imgFileName, Button autoButton)
+    {
+        string imagePath = Constants.BUTTON_PATH + imgFileName;
+        UpdateImage(imagePath,autoButton.image);
+    }
+
+    private IEnumerator StartAutoPlay()
+    {
+        while(isAutoPlay)
+        {
+            if(!typeWriterEffect.IsTyping())
+            {
+                DisplayNextLine();
+            }
+            yield return new WaitForSeconds(Constants.DEFAULT_WAITING_SECONDS);
+        }
+    }
 }

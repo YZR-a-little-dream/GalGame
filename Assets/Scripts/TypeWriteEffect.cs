@@ -8,7 +8,7 @@ using UnityEngine;
 /// </summary>
 public class TypeWriteEffect : MonoBehaviour
 {
-    public float WAITINGSECONDS = Constants.DEFAULT_WAITING_SECONDS;
+    //public float WAITINGSECONDS = Constants.DEFAULT_WAITING_SECONDS;
 
     public TextMeshProUGUI textDisplay;
 
@@ -34,7 +34,8 @@ public class TypeWriteEffect : MonoBehaviour
         for (int i  = 0; i  <= text.Length; i ++)
         {
             textDisplay.maxVisibleCharacters = i;
-            yield return new WaitForSeconds(WAITINGSECONDS);
+            
+            yield return new WaitForSeconds(Constants.DEFAULT_WAITING_SECONDS);
         }
 
         isTyping = false;
