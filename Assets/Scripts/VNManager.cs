@@ -14,24 +14,24 @@ public class VNManager : MonoBehaviour
 
     public TypeWriteEffect typeWriterEffect;
 
-    public Image avatorImage;               //Í·ÏñÍ¼Æ¬
-    public AudioSource vocalAudio;          //ÈËÉù
+    public Image avatorImage;               //å¤´åƒå›¾ç‰‡
+    public AudioSource vocalAudio;          //äººå£°
 
-    public Image backgroundImage;           //±³¾°Í¼Æ¬
-    public AudioSource backgroundMusic;     //±³¾°ÒôÀÖ
+    public Image backgroundImage;           //èƒŒæ™¯å›¾ç‰‡
+    public AudioSource backgroundMusic;     //èƒŒæ™¯éŸ³ä¹
 
-    public Image[] characterImageArr;            //½ÇÉ«Á¢»æÁĞ±í
+    public Image[] characterImageArr;            //è§’è‰²ç«‹ç»˜åˆ—è¡¨
       
     private List<ExcelReader.ExcelData> storyData;
 
     private int currentLine;
 
-    //·ÖÖ§Ãæ°å
+    //åˆ†æ”¯é¢æ¿
     public GameObject choicePanel;
     public Button choiceButton1;
     public Button choiceButton2;
 
-    //ÓÒÏÂ½ÇµÄ¿ØÖÆ°´Å¥
+    //å³ä¸‹è§’çš„æ§åˆ¶æŒ‰é’®
     public GameObject bottomButtonsPanel;
     public Button autoButton;    
     private bool isAutoPlay = false;
@@ -169,7 +169,7 @@ public class VNManager : MonoBehaviour
         currentLine++;
     }
 
-    #region  ¸üĞÂ½ÇÉ«Á¢»æ£¬½ÇÉ«Í·Ïñ£¬±³¾°Í¼Æ¬£¬¿ØÖÆ½ÇÉ«Á¢»æ¶¯»­
+    #region  æ›´æ–°è§’è‰²ç«‹ç»˜ï¼Œè§’è‰²å¤´åƒï¼ŒèƒŒæ™¯å›¾ç‰‡ï¼Œæ§åˆ¶è§’è‰²ç«‹ç»˜åŠ¨ç”»
     private void UpdateAvatarImage(string imageFileName)
     {
         string avatarImagepath = Constants.AVATAR_PATH + imageFileName;
@@ -208,7 +208,7 @@ public class VNManager : MonoBehaviour
         }
         else if(Action.StartsWith(Constants.CHARACTERACTION_DISAPPEAR))
         {
-            //Òş²Ø½ÇÉ«Á¢»æ,²¥·ÅÏûÊ§¶¯»­
+            //éšè—è§’è‰²ç«‹ç»˜,æ’­æ”¾æ¶ˆå¤±åŠ¨ç”»
             characterImage.DOFade(0,Constants.DEFAULT_DURATION_TIME).OnComplete
                 (() => characterImage.gameObject.SetActive(false));
         }
@@ -217,7 +217,7 @@ public class VNManager : MonoBehaviour
             float imgPositionX = CalImgPositionX(Action,
                 Constants.DEFAULT_MOVETO_START_POSITION,
                 Constants.DEFAULT_MOVETO_IRRELEVANT_CHAR);
-            //ÒÆ¶¯Á¢»æÎ»ÖÃ
+            //ç§»åŠ¨ç«‹ç»˜ä½ç½®
             if(NotLegalFloatNum(imgPositionX))
             {
                 characterImage.rectTransform.DOAnchorPosX(imgPositionX, Constants.DEFAULT_DURATION_TIME);
@@ -228,7 +228,7 @@ public class VNManager : MonoBehaviour
         }
     }
 
-    //¼ÆËã½ÇÉ«Á¢»æÓ¦¸Ã³öÏÖµÄÎ»ÖÃ×ø±ê
+    //è®¡ç®—è§’è‰²ç«‹ç»˜åº”è¯¥å‡ºç°çš„ä½ç½®åæ ‡
     private float CalImgPositionX(string Action,int numStartPosition, int IrrelevantChar)
     {
         ReadOnlySpan<char> span = Action.AsSpan();
@@ -242,10 +242,10 @@ public class VNManager : MonoBehaviour
     }
 
     /// <summary>
-    /// ¸üĞÂÍ¼Æ¬
+    /// æ›´æ–°å›¾ç‰‡
     /// </summary>
-    /// <param name="imagePath">Í¼Æ¬×ÊÔ´Â·¾¶</param>
-    /// <param name="characterImg">ĞèÒª¸üĞÂµÄÍ¼Æ¬×é¼ş</param>
+    /// <param name="imagePath">å›¾ç‰‡èµ„æºè·¯å¾„</param>
+    /// <param name="characterImg">éœ€è¦æ›´æ–°çš„å›¾ç‰‡ç»„ä»¶</param>
     private void UpdateImage(string imagePath, Image characterImg)
     {
         Sprite sprite = Resources.Load<Sprite>(imagePath);
@@ -261,7 +261,7 @@ public class VNManager : MonoBehaviour
     }
     #endregion
 
-    #region  ÒôÆµÒôÀÖ²¥·Å
+    #region  éŸ³é¢‘éŸ³ä¹æ’­æ”¾
     private void PlayerVocalAudio(string audioFileName)
     {
         string audioPath = Constants.VOCAL_PATH + audioFileName;
@@ -298,7 +298,7 @@ public class VNManager : MonoBehaviour
 
     #endregion
 
-    #region   ¸¨Öúº¯Êı
+    #region   è¾…åŠ©å‡½æ•°
     private bool NotNullOrEmpty(string str) => !string.IsNullOrEmpty(str);
 
     private bool NotLegalFloatNum(float num) => num != Constants.DEFAULT_UNEXiST_NUMBER;

@@ -13,18 +13,18 @@ public class ExcelReader : MonoBehaviour
         public string speakingContent;
         public string avatorImageFileName;
         public string vocalAudioFileName;
-        public string bgImageFileName;          //±³¾°Í¼Æ¬
-        public string bgMusicFileName;          //±³¾°ÒôÀÖ
+        public string bgImageFileName;          //èƒŒæ™¯å›¾ç‰‡
+        public string bgMusicFileName;          //èƒŒæ™¯éŸ³ä¹
 
-        public int characterNum;                //½ÇÉ«±àºÅ
-        public string characterAction;          //½ÇÉ«Î»ÖÃ
-        public string characterImgFileName;     //½ÇÉ«Á¢»æ
+        public int characterNum;                //è§’è‰²ç¼–å·
+        public string characterAction;          //è§’è‰²ä½ç½®
+        public string characterImgFileName;     //è§’è‰²ç«‹ç»˜
     }
 
     public static List<ExcelData> ReadExcel(string filepath)
     {
         List<ExcelData> excelData = new List<ExcelData>();
-        //¼æÈİĞÔ¿¼ÂÇ
+        //å…¼å®¹æ€§è€ƒè™‘
         Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
         using(FileStream stream = File.Open(filepath, FileMode.Open, FileAccess.Read))
         {

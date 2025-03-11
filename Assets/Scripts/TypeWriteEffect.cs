@@ -3,9 +3,6 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
-/// <summary>
-/// 实现打字效果
-/// </summary>
 public class TypeWriteEffect : MonoBehaviour
 {
     //public float WAITINGSECONDS = Constants.DEFAULT_WAITING_SECONDS;

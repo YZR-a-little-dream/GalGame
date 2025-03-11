@@ -28,14 +28,14 @@ public class Constants : MonoBehaviour
     public static string CHOICE = "choice";
 
     public static string CHARACTERACTION_APPEARAT = "appearAt";
-    public static int DEFAULT_APPEARAT_START_POSITION = 9;          //appearAt( ´ÓµÚ9¸öÎ»ÖÃ¶ÁÈ¡ÊıÖµ
-    public static int DEFAULT_APPEARAT_IRRELEVANT_CHAR = 10;   //ÎŞ¹Ø×Ö·ûÊıÁ¿Îª10£¬Ö»¶ÁÈ¡£¨x£¬y£©µÄ³¤¶È
+    public static int DEFAULT_APPEARAT_START_POSITION = 9;          //appearAt( ä»ç¬¬9ä¸ªä½ç½®è¯»å–æ•°å€¼
+    public static int DEFAULT_APPEARAT_IRRELEVANT_CHAR = 10;   //æ— å…³å­—ç¬¦æ•°é‡ä¸º10ï¼Œåªè¯»å–ï¼ˆxï¼Œyï¼‰çš„é•¿åº¦
     public static string CHARACTERACTION_DISAPPEAR = "disappear";
     
     public static string CHARACTERACTION_MOVETO = "moveTo";
-    public static int DEFAULT_MOVETO_START_POSITION = 7;          //moveTo( ´ÓµÚ7¸öÎ»ÖÃ¶ÁÈ¡ÊıÖµ
-    public static int DEFAULT_MOVETO_IRRELEVANT_CHAR = 8;       //ÎŞ¹Ø×Ö·ûÊıÁ¿Îª8£¬Ö»¶ÁÈ¡£¨x£¬y£©µÄ³¤¶È
-    public static int DEFAULT_DURATION_TIME = 1;                    //¶¯»­³ÖĞøÊ±¼äÎª1Ãë
+    public static int DEFAULT_MOVETO_START_POSITION = 7;          //moveTo( ä»ç¬¬7ä¸ªä½ç½®è¯»å–æ•°å€¼
+    public static int DEFAULT_MOVETO_IRRELEVANT_CHAR = 8;       //æ— å…³å­—ç¬¦æ•°é‡ä¸º8ï¼Œåªè¯»å–ï¼ˆxï¼Œyï¼‰çš„é•¿åº¦
+    public static int DEFAULT_DURATION_TIME = 1;                    //åŠ¨ç”»æŒç»­æ—¶é—´ä¸º1ç§’
     public static string COORDINATE_MISSING = "Coordinate missing";
 
     public static string AUTO_ON = "autoplayon";
