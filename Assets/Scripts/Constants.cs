@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class Constants : MonoBehaviour
 {   
-    public static float DEFAULT_WAITING_SECONDS = 0.05f;
+    public static float DEFAULT_TYPING_SPEED = 0.05f;
     public static float DEFAULT_SKIP_MODE_TYPING_SPEED = 0.01f;
     public static int DEFAULT_START_LINE = 1;
     public static int DEFAULT_UNEXiST_NUMBER = -1;
@@ -40,5 +40,9 @@ public class Constants : MonoBehaviour
 
     public static string AUTO_ON = "autoplayon";
     public static string AUTO_OFF = "autoplayoff";
+    public static float DEFAULT_AUTO_WAITING_SECONDS = 0.1f;
     
+    public static string SKIP_ON = "skipon";
+    public static string SKIP_OFF = "skioff";
+    public static float DEFAULT_SKIP_WAITING_SECONDS = 0.02f;
 }

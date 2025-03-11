@@ -25,6 +25,7 @@ public class VNManager : MonoBehaviour
     private List<ExcelReader.ExcelData> storyData;
 
     private int currentLine;
+    private string currentStoryFileName;
 
     //分支面板
     public GameObject choicePanel;
@@ -33,11 +34,18 @@ public class VNManager : MonoBehaviour
 
     //右下角的控制按钮
     public GameObject bottomButtonsPanel;
-    public Button autoButton;    
+    public Button autoButton;   
+    public Button skipButton;   
     private bool isAutoPlay = false;
+    private bool isSkip = false;
+
+    private int maxReachedLineIndex = 0;
+    //全局存储每个文件的最远行索引 string:fileName, int:lines
+    private Dictionary<string,int> globalMaxReachedLineIndicesDict = new Dictionary<string, int>();
 
     void Start()
     {
+        bottomButtonsAddListener();
         InitializeAndLoadStory(Constants.DEFAULT_STORY_FILE_NAME);
     }
 
@@ -50,6 +58,12 @@ public class VNManager : MonoBehaviour
                 DisplayNextLine();
             }
         }
+    }
+
+    private void bottomButtonsAddListener()
+    {
+        autoButton.onClick.AddListener(OnAutoButtonClick);
+        skipButton.onClick.AddListener(OnSkipButtonClick);
     }
 
     private void InitializeAndLoadStory(string defaultStoryFileName)
@@ -69,12 +83,11 @@ public class VNManager : MonoBehaviour
             img.gameObject.SetActive(false);
         }
         choicePanel.SetActive(false);
-
-        autoButton.onClick.AddListener(OnAutoButtonClick);
     }
 
     private void loadStoryFromFile(string fileName)
     {
+        currentStoryFileName = fileName;
         string path = Constants.STORY_PATH + fileName + Constants.DEFAULT_FILE_EXTENSION;
         storyData = ExcelReader.ReadExcel(path);
         
@@ -82,23 +95,44 @@ public class VNManager : MonoBehaviour
         {
             Debug.LogError(Constants.NO_DATA_FOUND);
         }
+
+        if(globalMaxReachedLineIndicesDict.ContainsKey(currentStoryFileName))
+        {
+            maxReachedLineIndex = globalMaxReachedLineIndicesDict[currentStoryFileName]; 
+        }
+        else{
+            maxReachedLineIndex = 0;
+            globalMaxReachedLineIndicesDict[currentStoryFileName] = maxReachedLineIndex;
+        }
     }
 
     private void DisplayNextLine()
     {
-        if(currentLine == storyData.Count - 1)
+        if(currentLine > maxReachedLineIndex)
         {
+            maxReachedLineIndex = currentLine;
+            globalMaxReachedLineIndicesDict[currentStoryFileName] = maxReachedLineIndex;
+        }
+
+        if(currentLine >= storyData.Count - 1)
+        {
+            //退出自动播放
+            if(isAutoPlay)
+            {
+                isAutoPlay = false;
+                UpdateButtonImage(Constants.AUTO_OFF,autoButton);
+            }
+
             if(storyData[currentLine].speakerName.Equals(Constants.END_OF_STORY))
             {
                 Debug.Log(Constants.END_OF_STORY);
-                return;
             }
             
             if(storyData[currentLine].speakerName.Equals(Constants.CHOICE))
             {
                 showChociePanel();
-                return;
             }
+            return;
         }
         
         if(currentLine >= storyData.Count)
@@ -304,6 +338,9 @@ public class VNManager : MonoBehaviour
     private bool NotLegalFloatNum(float num) => num != Constants.DEFAULT_UNEXiST_NUMBER;
     #endregion
 
+
+    #region 右下底部按钮
+    
     private bool IsHittingBottomButtons()
     {
         return RectTransformUtility.RectangleContainsScreenPoint(
@@ -313,6 +350,13 @@ public class VNManager : MonoBehaviour
         );
     }
 
+    private void UpdateButtonImage(string imgFileName, Button autoButton)
+    {
+        string imagePath = Constants.BUTTON_PATH + imgFileName;
+        UpdateImage(imagePath,autoButton.image);
+    }
+    
+    #region 自动播放
     private void OnAutoButtonClick()
     {
         isAutoPlay = !isAutoPlay;
@@ -323,11 +367,7 @@ public class VNManager : MonoBehaviour
         }
     }
 
-    private void UpdateButtonImage(string imgFileName, Button autoButton)
-    {
-        string imagePath = Constants.BUTTON_PATH + imgFileName;
-        UpdateImage(imagePath,autoButton.image);
-    }
+    
 
     private IEnumerator StartAutoPlay()
     {
@@ -337,7 +377,58 @@ public class VNManager : MonoBehaviour
             {
                 DisplayNextLine();
             }
-            yield return new WaitForSeconds(Constants.DEFAULT_WAITING_SECONDS);
+            yield return new WaitForSeconds(Constants.DEFAULT_AUTO_WAITING_SECONDS);
         }
     }
+
+    #endregion 
+
+    #region 快速跳过
+    private void OnSkipButtonClick()
+    {
+        if(!isSkip && CanSkip())
+        {
+            StartSkip();
+        }
+        else if(isSkip){
+            StopCoroutine(skipToMaxReachedLine());
+            EndSkip();
+        }
+    }
+
+    private bool CanSkip() => currentLine < maxReachedLineIndex;
+    
+    private void StartSkip()
+    {
+        isSkip = true;
+        UpdateButtonImage(Constants.SKIP_ON,skipButton);
+        typeWriterEffect.TYPINGSPEED = Constants.DEFAULT_SKIP_MODE_TYPING_SPEED;
+        StartCoroutine(skipToMaxReachedLine());
+    }
+
+    private IEnumerator skipToMaxReachedLine()
+    {
+        while(isSkip)
+        {
+            if(CanSkip())
+            {
+                displayThisLine();
+            }
+            else{
+                EndSkip();
+            }
+            //控制快速跳过的节奏
+            yield return new WaitForSeconds(Constants.DEFAULT_AUTO_WAITING_SECONDS);
+        }
+    }
+
+    private void EndSkip()
+    {
+        isSkip = false;
+        typeWriterEffect.TYPINGSPEED = Constants.DEFAULT_TYPING_SPEED;
+        UpdateButtonImage(Constants.AUTO_OFF,skipButton);
+    }
+    #endregion
+
+    #endregion
 }

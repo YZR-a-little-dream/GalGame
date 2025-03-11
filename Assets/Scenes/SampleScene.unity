@@ -1033,6 +1033,7 @@ MonoBehaviour:
   choiceButton2: {fileID: 277973587}
   bottomButtonsPanel: {fileID: 745899245}
   autoButton: {fileID: 1183218244}
+  skipButton: {fileID: 1506630911}
 --- !u!4 &645197600
 Transform:
   m_ObjectHideFlags: 0
@@ -2106,7 +2107,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4e17e9006eaf5aa43b14eedb7508516b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  WAITINGSECONDS: 0.05
+  TYPINGSPEED: 0.05
   textDisplay: {fileID: 1021101360}
 --- !u!1 &1397242131
 GameObject:
