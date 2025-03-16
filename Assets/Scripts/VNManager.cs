@@ -40,7 +40,7 @@ public class VNManager : MonoBehaviour
     private bool isSkip = false;
 
     private int maxReachedLineIndex = 0;
-    //全局存储每个文件的最远行索引 string:fileName, int:lines
+    //全局存储每个文件的最远行索引 string:fileName, int:maxReachedLineIndex
     private Dictionary<string,int> globalMaxReachedLineIndicesDict = new Dictionary<string, int>();
 
     void Start()

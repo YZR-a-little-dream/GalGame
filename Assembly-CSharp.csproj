@@ -69,6 +69,7 @@
     <Compile Include="Assets\Scripts\ExcelReader.cs" />
     <Compile Include="Assets\Scripts\Constants.cs" />
     <Compile Include="Assets\Scripts\CSVReader\CSVReader.cs" />
+    <Compile Include="Assets\Scripts\test.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\TextMesh Pro\Shaders\TMPro.cginc" />
