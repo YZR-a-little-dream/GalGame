@@ -65,9 +65,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Scripts\TypeWriteEffect.cs" />
+    <Compile Include="Assets\Scripts\SingletonMonoBase.cs" />
     <Compile Include="Assets\Scripts\VNManager.cs" />
     <Compile Include="Assets\Scripts\ExcelReader.cs" />
     <Compile Include="Assets\Scripts\Constants.cs" />
+    <Compile Include="Assets\Scripts\SaveLoadManager.cs" />
     <Compile Include="Assets\Scripts\CSVReader\CSVReader.cs" />
     <Compile Include="Assets\Scripts\test.cs" />
   </ItemGroup>

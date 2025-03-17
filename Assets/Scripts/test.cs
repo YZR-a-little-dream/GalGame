@@ -4,27 +4,21 @@ using UnityEngine;
 
 public class test : MonoBehaviour
 {
-    public static test instance;
-
-    int a = 0;
-    
-
     // Start is called before the first frame update
     void Start()
     {
-        StartCoroutine(Task());
+        
+    }
+
+    private void OnEnable() {
+        SaveLoadManager.Instance.ShowSaveLoadUI(true);
     }
 
     // Update is called once per frame
     void Update()
     {
-        print("update");
+        
     }
 
-    public IEnumerator Task()
-    {
-        print("1");
-        yield return new WaitForEndOfFrame();
-        print("2");
-    }
+    
 }

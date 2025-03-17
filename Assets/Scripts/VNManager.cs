@@ -36,6 +36,8 @@ public class VNManager : MonoBehaviour
     public GameObject bottomButtonsPanel;
     public Button autoButton;   
     public Button skipButton;   
+    public Button saveButton;
+    public Button loadButton;
     private bool isAutoPlay = false;
     private bool isSkip = false;
 
@@ -45,8 +47,11 @@ public class VNManager : MonoBehaviour
 
     void Start()
     {
-        bottomButtonsAddListener();
         InitializeAndLoadStory(Constants.DEFAULT_STORY_FILE_NAME);
+    }
+    
+    private void OnEnable() {
+        bottomButtonsAddListener();
     }
 
     void Update()
@@ -64,6 +69,8 @@ public class VNManager : MonoBehaviour
     {
         autoButton.onClick.AddListener(OnAutoButtonClick);
         skipButton.onClick.AddListener(OnSkipButtonClick);
+        saveButton.onClick.AddListener(OnSaveButtonClick);
+        loadButton.onClick.AddListener(OnLoadButtonClick);
     }
 
     private void InitializeAndLoadStory(string defaultStoryFileName)
@@ -383,6 +390,8 @@ public class VNManager : MonoBehaviour
 
     #endregion 
 
+
+
     #region 快速跳过
     private void OnSkipButtonClick()
     {
@@ -429,6 +438,23 @@ public class VNManager : MonoBehaviour
         UpdateButtonImage(Constants.AUTO_OFF,skipButton);
     }
     #endregion
+
+
+
+    #region 保存和加载
+    private void OnSaveButtonClick()
+    {
+        SaveLoadManager.Instance.ShowSaveLoadUI(true);
+    }
+
+    private void OnLoadButtonClick()
+    {
+        SaveLoadManager.Instance.ShowSaveLoadUI(false);
+    }
+
+    
+    #endregion
+
 
     #endregion
 }

@@ -1,3 +1,4 @@
+using JetBrains.Annotations;
 using UnityEngine;
 
 public class Constants : MonoBehaviour
@@ -45,4 +46,13 @@ public class Constants : MonoBehaviour
     public static string SKIP_ON = "skipon";
     public static string SKIP_OFF = "skioff";
     public static float DEFAULT_SKIP_WAITING_SECONDS = 0.02f;
+
+    public static int DEFAULT_START_INDEX = 0;
+    public static int SLOTS_PER_PAGE = 8;                         //每页显示8个栏位
+    public static int TOTAL_SLOTS = 40;                           //总共40个栏位
+    public static string COLON = ": ";
+    public static string SAVE_GAME = "Save_game";
+    public static string LOAD_GAME = "Load_game";
+    public static string Empty_SLOT = "Empty_slot";
+
 }
