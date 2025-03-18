@@ -7,8 +7,10 @@ using UnityEngine;
 using UnityEngine.UI;
 using DG.Tweening;
 
-public class VNManager : MonoBehaviour
+public class VNManager : SingletonMonoBase<VNManager>
 {
+    public GameObject gamePanel;
+    public GameObject dialogueBox;
     public TextMeshProUGUI speakerName;
     public TextMeshProUGUI speakingContent;
 
@@ -34,10 +36,8 @@ public class VNManager : MonoBehaviour
 
     //右下角的控制按钮
     public GameObject bottomButtonsPanel;
-    public Button autoButton;   
-    public Button skipButton;   
-    public Button saveButton;
-    public Button loadButton;
+    public Button autoButton,skipButton,saveButton,loadButton,
+    historyButton,settingsButton,homeButton,closeButton;   
     private bool isAutoPlay = false;
     private bool isSkip = false;
 
@@ -47,20 +47,29 @@ public class VNManager : MonoBehaviour
 
     void Start()
     {
-        InitializeAndLoadStory(Constants.DEFAULT_STORY_FILE_NAME);
+        bottomButtonsAddListener();
+        gamePanel.SetActive(false);
     }
     
-    private void OnEnable() {
-        bottomButtonsAddListener();
+    public void startGame()
+    {
+        InitializeAndLoadStory(Constants.DEFAULT_STORY_FILE_NAME);
     }
 
     void Update()
     {
-        if(Input.GetMouseButtonDown(0))
+        if(gamePanel.activeSelf && Input.GetMouseButton(0))
         {
-            if(!IsHittingBottomButtons())
+            if(!dialogueBox.activeSelf)
             {
-                DisplayNextLine();
+                OpenGameUI();
+            }                
+            else if(!IsHittingBottomButtons())
+            {
+                if(!SaveLoadManager.Instance.saveLoadPanel.activeSelf)
+                {
+                    DisplayNextLine();
+                }
             }
         }
     }
@@ -71,6 +80,10 @@ public class VNManager : MonoBehaviour
         skipButton.onClick.AddListener(OnSkipButtonClick);
         saveButton.onClick.AddListener(OnSaveButtonClick);
         loadButton.onClick.AddListener(OnLoadButtonClick);
+
+        homeButton.onClick.AddListener(OnHomeButtonClick);
+        closeButton.onClick.AddListener(OnCloseButtonClick);
+    
     }
 
     private void InitializeAndLoadStory(string defaultStoryFileName)
@@ -348,6 +361,19 @@ public class VNManager : MonoBehaviour
 
     #region 右下底部按钮
     
+    private void OpenGameUI()
+    {
+        dialogueBox.SetActive(true);
+        bottomButtonsPanel.SetActive(true);
+    }
+
+    private void CloseGameUI()
+    {
+        dialogueBox.SetActive(false);
+        bottomButtonsPanel.SetActive(false);
+    }
+
+
     private bool IsHittingBottomButtons()
     {
         return RectTransformUtility.RectangleContainsScreenPoint(
@@ -452,8 +478,20 @@ public class VNManager : MonoBehaviour
         SaveLoadManager.Instance.ShowSaveLoadUI(false);
     }
 
-    
+     private void OnHomeButtonClick()
+    {
+        gamePanel.SetActive(false);
+        MenuManager.Instance.menuPanel.SetActive(true);
+    }
+
+    private void OnCloseButtonClick()
+    {
+        CloseGameUI();
+    }
+
+
     #endregion
+
 
 
     #endregion
