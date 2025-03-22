@@ -4,17 +4,17 @@ using TMPro;
 using UnityEngine;
 
 public class TypeWriteEffect : MonoBehaviour
-{
-    public float TYPINGSPEED = Constants.DEFAULT_TYPING_SPEED;
-
+{   
+    private float typingSpeed;
     public TextMeshProUGUI textDisplay;
 
     private Coroutine typingCoroutine;
 
     private bool isTyping;
 
-    public void StartTyping(string text)
+    public void StartTyping(string text,float speed)
     {
+        typingSpeed = speed;
         if (typingCoroutine!= null)
         {
             StopCoroutine(typingCoroutine);
@@ -32,7 +32,7 @@ public class TypeWriteEffect : MonoBehaviour
         {
             textDisplay.maxVisibleCharacters = i;
             
-            yield return new WaitForSeconds(TYPINGSPEED);
+            yield return new WaitForSeconds(typingSpeed);
         }
 
         isTyping = false;

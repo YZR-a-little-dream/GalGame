@@ -31,9 +31,9 @@ public class MenuManager : SingletonMonoBase<MenuManager>
     private void StartGame()
     {
         hasStarted = true;
-        VNManager.Instance.startGame();
         menuPanel.SetActive(false);
         VNManager.Instance.gamePanel.SetActive(true);
+        VNManager.Instance.startGame();
     }
 
     private void ContinueGame()

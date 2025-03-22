@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class Constants : MonoBehaviour
 {   
-    public static float DEFAULT_TYPING_SPEED = 0.05f;
+    public static float DEFAULT_TYPING_SPEED = 0.5f;
     public static float DEFAULT_SKIP_MODE_TYPING_SPEED = 0.01f;
     public static int DEFAULT_START_LINE = 1;
     public static int DEFAULT_UNEXiST_NUMBER = -1;
@@ -54,5 +54,10 @@ public class Constants : MonoBehaviour
     public static string SAVE_GAME = "Save_game";
     public static string LOAD_GAME = "Load_game";
     public static string Empty_SLOT = "Empty_slot";
+
+    public static string CAMERA_NOT_FOUND = "Main camera  notfound.";
+
+    public static string SAVE_FILE_PATH = "saves";
+    public static string SAVE_FILE_EXTENSION = ".json";
 
 }

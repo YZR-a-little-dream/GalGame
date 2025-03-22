@@ -11,7 +11,7 @@ public class test : MonoBehaviour
     }
 
     private void OnEnable() {
-        SaveLoadManager.Instance.ShowSaveLoadUI(true);
+        
     }
 
     // Update is called once per frame

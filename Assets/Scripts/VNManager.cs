@@ -6,15 +6,19 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using DG.Tweening;
+using System.IO;
+using Newtonsoft.Json;
 
 public class VNManager : SingletonMonoBase<VNManager>
 {
+    #region variables
     public GameObject gamePanel;
     public GameObject dialogueBox;
     public TextMeshProUGUI speakerName;
-    public TextMeshProUGUI speakingContent;
 
     public TypeWriteEffect typeWriterEffect;
+
+    public ScreenShotter screenShotter;      //截图工具
 
     public Image avatorImage;               //头像图片
     public AudioSource vocalAudio;          //人声
@@ -28,6 +32,7 @@ public class VNManager : SingletonMonoBase<VNManager>
 
     private int currentLine;
     private string currentStoryFileName;
+    private float currentTypingSpeed = Constants.DEFAULT_TYPING_SPEED;
 
     //分支面板
     public GameObject choicePanel;
@@ -45,20 +50,24 @@ public class VNManager : SingletonMonoBase<VNManager>
     //全局存储每个文件的最远行索引 string:fileName, int:maxReachedLineIndex
     private Dictionary<string,int> globalMaxReachedLineIndicesDict = new Dictionary<string, int>();
 
+
+    private string saveFolderPath;
+    private byte[] screenshotData;          //保存截图数据
+    private string currentSpeakingContent;  //保存当前对话内容
+    #endregion
+
+    #region life cycle
     void Start()
     {
+        InitializeSaveFilePath();
         bottomButtonsAddListener();
-        gamePanel.SetActive(false);
-    }
-    
-    public void startGame()
-    {
-        InitializeAndLoadStory(Constants.DEFAULT_STORY_FILE_NAME);
     }
 
     void Update()
     {
-        if(gamePanel.activeSelf && Input.GetMouseButton(0))
+        if(!MenuManager.Instance.menuPanel.activeSelf &&
+            !SaveLoadManager.Instance.saveLoadPanel.activeSelf &&
+            gamePanel.activeSelf && Input.GetMouseButtonDown(0))
         {
             if(!dialogueBox.activeSelf)
             {
@@ -66,14 +75,26 @@ public class VNManager : SingletonMonoBase<VNManager>
             }                
             else if(!IsHittingBottomButtons())
             {
-                if(!SaveLoadManager.Instance.saveLoadPanel.activeSelf)
-                {
-                    DisplayNextLine();
-                }
+                DisplayNextLine();
             }
         }
     }
+    #endregion
 
+    #region Initalize
+    private void InitializeSaveFilePath()
+    {
+        saveFolderPath = Path.Combine(Application.persistentDataPath, Constants.SAVE_FILE_PATH);
+        if(!Directory.Exists(saveFolderPath))
+        {
+            Directory.CreateDirectory(saveFolderPath);
+        }
+    }
+
+    public void startGame()
+    {
+        InitializeAndLoadStory(Constants.DEFAULT_STORY_FILE_NAME);
+    }
     private void bottomButtonsAddListener()
     {
         autoButton.onClick.AddListener(OnAutoButtonClick);
@@ -96,14 +117,21 @@ public class VNManager : SingletonMonoBase<VNManager>
     private void Initialize()
     {
         currentLine= Constants.DEFAULT_START_LINE;
-        avatorImage.gameObject.SetActive(false);
+
         backgroundImage.gameObject.SetActive(false);
+        backgroundMusic.gameObject.SetActive(false);
+
+        avatorImage.gameObject.SetActive(false);
+        vocalAudio.gameObject.SetActive(false);
+        
         foreach (var img in characterImageArr)
         {
             img.gameObject.SetActive(false);
         }
+
         choicePanel.SetActive(false);
     }
+    
 
     private void loadStoryFromFile(string fileName)
     {
@@ -125,7 +153,9 @@ public class VNManager : SingletonMonoBase<VNManager>
             globalMaxReachedLineIndicesDict[currentStoryFileName] = maxReachedLineIndex;
         }
     }
-
+    #endregion
+    
+    #region  Display Line
     private void DisplayNextLine()
     {
         if(currentLine > maxReachedLineIndex)
@@ -133,7 +163,6 @@ public class VNManager : SingletonMonoBase<VNManager>
             maxReachedLineIndex = currentLine;
             globalMaxReachedLineIndicesDict[currentStoryFileName] = maxReachedLineIndex;
         }
-
         if(currentLine >= storyData.Count - 1)
         {
             //退出自动播放
@@ -170,24 +199,12 @@ public class VNManager : SingletonMonoBase<VNManager>
         }
     }
 
-    private void showChociePanel()
-    {
-        var data = storyData[currentLine];
-        choiceButton1.onClick.RemoveAllListeners();
-        choiceButton2.onClick.RemoveAllListeners();
-        choicePanel.SetActive(true);
-        choiceButton1.GetComponentInChildren<TextMeshProUGUI>().text = data.speakingContent;
-        choiceButton1.onClick.AddListener(() => InitializeAndLoadStory(data.avatorImageFileName));
-        choiceButton2.GetComponentInChildren<TextMeshProUGUI>().text = data.vocalAudioFileName;
-        choiceButton2.onClick.AddListener(() => InitializeAndLoadStory(data.bgImageFileName));
-    }
-
     private void displayThisLine()
     {
         var data = storyData[currentLine];
         speakerName.text = data.speakerName;
-        speakingContent.text = data.speakingContent;
-        typeWriterEffect.StartTyping(data.speakingContent);
+        currentSpeakingContent = data.speakingContent;
+        typeWriterEffect.StartTyping(currentSpeakingContent,currentTypingSpeed);
         
         if(NotNullOrEmpty(data.avatorImageFileName))
         {
@@ -223,7 +240,23 @@ public class VNManager : SingletonMonoBase<VNManager>
         currentLine++;
     }
 
-    #region  更新角色立绘，角色头像，背景图片，控制角色立绘动画
+    #endregion
+
+    #region  show choice panel
+    private void showChociePanel()
+    {
+        var data = storyData[currentLine];
+        choiceButton1.onClick.RemoveAllListeners();
+        choiceButton2.onClick.RemoveAllListeners();
+        choicePanel.SetActive(true);
+        choiceButton1.GetComponentInChildren<TextMeshProUGUI>().text = data.speakingContent;
+        choiceButton1.onClick.AddListener(() => InitializeAndLoadStory(data.avatorImageFileName));
+        choiceButton2.GetComponentInChildren<TextMeshProUGUI>().text = data.vocalAudioFileName;
+        choiceButton2.onClick.AddListener(() => InitializeAndLoadStory(data.bgImageFileName));
+    }
+    #endregion
+
+    #region  Images and Character Animations
     private void UpdateAvatarImage(string imageFileName)
     {
         string avatarImagepath = Constants.AVATAR_PATH + imageFileName;
@@ -315,7 +348,7 @@ public class VNManager : SingletonMonoBase<VNManager>
     }
     #endregion
 
-    #region  音频音乐播放
+    #region  Music and Audio
     private void PlayerVocalAudio(string audioFileName)
     {
         string audioPath = Constants.VOCAL_PATH + audioFileName;
@@ -334,6 +367,7 @@ public class VNManager : SingletonMonoBase<VNManager>
         if (audioClip != null)
         {
             audioSource.clip = audioClip;
+            audioSource.gameObject.SetActive(true);
             audioSource.Play();
             audioSource.loop = isLoop;
         }
@@ -352,44 +386,34 @@ public class VNManager : SingletonMonoBase<VNManager>
 
     #endregion
 
-    #region   辅助函数
+    #region   Utils
     private bool NotNullOrEmpty(string str) => !string.IsNullOrEmpty(str);
 
     private bool NotLegalFloatNum(float num) => num != Constants.DEFAULT_UNEXiST_NUMBER;
     #endregion
 
 
-    #region 右下底部按钮
-    
-    private void OpenGameUI()
-    {
-        dialogueBox.SetActive(true);
-        bottomButtonsPanel.SetActive(true);
-    }
-
-    private void CloseGameUI()
-    {
-        dialogueBox.SetActive(false);
-        bottomButtonsPanel.SetActive(false);
-    }
-
-
-    private bool IsHittingBottomButtons()
-    {
-        return RectTransformUtility.RectangleContainsScreenPoint(
-            bottomButtonsPanel.GetComponent<RectTransform>(),
-            Input.mousePosition,
-            null
-        );
-    }
-
+    #region Buttons
+    #region  Untils
     private void UpdateButtonImage(string imgFileName, Button autoButton)
     {
         string imagePath = Constants.BUTTON_PATH + imgFileName;
         UpdateImage(imagePath,autoButton.image);
     }
+    #endregion
+
+    #region Bottom
+    private bool IsHittingBottomButtons()
+    {
+        return RectTransformUtility.RectangleContainsScreenPoint(
+            bottomButtonsPanel.GetComponent<RectTransform>(),
+            Input.mousePosition,
+            Camera.main
+        );
+    }
+    #endregion
     
-    #region 自动播放
+    #region AutoPlay
     private void OnAutoButtonClick()
     {
         isAutoPlay = !isAutoPlay;
@@ -415,10 +439,8 @@ public class VNManager : SingletonMonoBase<VNManager>
     }
 
     #endregion 
-
-
-
-    #region 快速跳过
+    
+    #region Skip
     private void OnSkipButtonClick()
     {
         if(!isSkip && CanSkip())
@@ -437,7 +459,7 @@ public class VNManager : SingletonMonoBase<VNManager>
     {
         isSkip = true;
         UpdateButtonImage(Constants.SKIP_ON,skipButton);
-        typeWriterEffect.TYPINGSPEED = Constants.DEFAULT_SKIP_MODE_TYPING_SPEED;
+        currentTypingSpeed = Constants.DEFAULT_SKIP_MODE_TYPING_SPEED;
         StartCoroutine(skipToMaxReachedLine());
     }
 
@@ -460,39 +482,76 @@ public class VNManager : SingletonMonoBase<VNManager>
     private void EndSkip()
     {
         isSkip = false;
-        typeWriterEffect.TYPINGSPEED = Constants.DEFAULT_TYPING_SPEED;
-        UpdateButtonImage(Constants.AUTO_OFF,skipButton);
+        currentTypingSpeed = Constants.DEFAULT_TYPING_SPEED;
+        UpdateButtonImage(Constants.SKIP_OFF,skipButton);
+    }
+    #endregion
+    #region save 
+    private void OnSaveButtonClick()
+    {
+        CloseGameUI();
+        Texture2D screenshot = screenShotter.CaptureScreenshot();
+        screenshotData = screenshot.EncodeToPNG();
+        SaveLoadManager.Instance.showSavePanel(SaveGame);
+        OpenGameUI();
+    }
+
+    private void SaveGame(int slotIndex)
+    {
+        var saveData = new saveData{
+            currentSpeekingContent = currentSpeakingContent,
+            screenshotData = screenshotData
+        };
+        string savePath = Path.Combine(saveFolderPath, slotIndex + Constants.SAVE_FILE_EXTENSION);
+        string json = JsonConvert.SerializeObject(saveData,Formatting.Indented);
+        File.WriteAllText(savePath,json);
+    }
+
+    public class saveData
+    {
+        public string currentSpeekingContent;
+        public byte[] screenshotData;
+    }
+
+    #endregion
+
+    #region load
+    private void OnLoadButtonClick()
+    {
+        SaveLoadManager.Instance.showLoadPanel(LoadGame);
+    }
+
+    private void LoadGame(int slotIndex)
+    {
+
     }
     #endregion
 
-
-
-    #region 保存和加载
-    private void OnSaveButtonClick()
-    {
-        SaveLoadManager.Instance.ShowSaveLoadUI(true);
-    }
-
-    private void OnLoadButtonClick()
-    {
-        SaveLoadManager.Instance.ShowSaveLoadUI(false);
-    }
-
+    #region Home
      private void OnHomeButtonClick()
     {
         gamePanel.SetActive(false);
         MenuManager.Instance.menuPanel.SetActive(true);
     }
-
+    #endregion
+    
+    #region  Close
     private void OnCloseButtonClick()
     {
         CloseGameUI();
     }
+    private void OpenGameUI()
+    {
+        dialogueBox.SetActive(true);
+        bottomButtonsPanel.SetActive(true);
+    }
 
-
+    private void CloseGameUI()
+    {
+        dialogueBox.SetActive(false);
+        bottomButtonsPanel.SetActive(false);
+    }
     #endregion
-
-
 
     #endregion
 }
