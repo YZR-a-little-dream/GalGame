@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class Constants : MonoBehaviour
 {   
-    public static float DEFAULT_TYPING_SPEED = 0.5f;
+    public static float DEFAULT_TYPING_SPEED = 0.05f;
     public static float DEFAULT_SKIP_MODE_TYPING_SPEED = 0.01f;
     public static int DEFAULT_START_LINE = 1;
     public static int DEFAULT_UNEXiST_NUMBER = -1;

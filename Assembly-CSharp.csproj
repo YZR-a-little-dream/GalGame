@@ -74,6 +74,7 @@
     <Compile Include="Assets\Scripts\SaveLoadManager.cs" />
     <Compile Include="Assets\Scripts\CSVReader\CSVReader.cs" />
     <Compile Include="Assets\Scripts\test.cs" />
+    <Compile Include="Assets\Scripts\CharacterImgController.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\TextMesh Pro\Shaders\TMPro.cginc" />

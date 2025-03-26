@@ -19,6 +19,9 @@ public class ExcelReader : MonoBehaviour
         public int characterNum;                //角色编号
         public string characterAction;          //角色位置
         public string characterImgFileName;     //角色立绘
+
+        public string lastBgImg;
+        public string lastBgMusic; 
     }
 
     public static List<ExcelData> ReadExcel(string filepath)
@@ -47,6 +50,8 @@ public class ExcelReader : MonoBehaviour
                         int.TryParse(reader.GetValue(6)?.ToString() , out num) ? num : Constants.DEFAULT_UNEXiST_NUMBER;
                         data.characterAction = reader.IsDBNull(7) ? string.Empty : reader.GetValue(7)?.ToString();
                         data.characterImgFileName = reader.IsDBNull(8) ? string.Empty : reader.GetValue(8)?.ToString();
+                        data.lastBgImg = reader.IsDBNull(9) ? string.Empty : reader.GetValue(9)?.ToString();
+                        data.lastBgMusic = reader.IsDBNull(10) ? string.Empty : reader.GetValue(10)?.ToString();
                         excelData.Add(data);
                     }
                 }while(reader.NextResult());

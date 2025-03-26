@@ -16,6 +16,7 @@ public class MenuManager : SingletonMonoBase<MenuManager>
     private bool hasStarted = false;
 
     private void Start() {
+        continueButton.interactable = false;
         menuButtonsAddListener();
     }
 
@@ -31,8 +32,8 @@ public class MenuManager : SingletonMonoBase<MenuManager>
     private void StartGame()
     {
         hasStarted = true;
-        menuPanel.SetActive(false);
-        VNManager.Instance.gamePanel.SetActive(true);
+        continueButton.interactable = true;
+        ShowGamePanel();
         VNManager.Instance.startGame();
     }
 
@@ -40,14 +41,14 @@ public class MenuManager : SingletonMonoBase<MenuManager>
     {
         if(hasStarted)
         {
-            menuPanel.SetActive(false);
-            VNManager.Instance.gamePanel.SetActive(true);
+            ShowGamePanel();
         }
     }
 
     private void LoadGame()
     {
-        //TODO: 实现加载游戏功能
+        //实现加载游戏功能
+        VNManager.Instance.ShowLoadPanel(ShowGamePanel);
     }
 
     private void OpenSettings()
@@ -57,5 +58,11 @@ public class MenuManager : SingletonMonoBase<MenuManager>
 
     private void ExitGame()
     {
+    }
+
+    private void ShowGamePanel()
+    {
+        menuPanel.SetActive(false);
+        VNManager.Instance.gamePanel.SetActive(true);
     }
 }

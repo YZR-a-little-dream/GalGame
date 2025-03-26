@@ -11,6 +11,8 @@ using Newtonsoft.Json;
 
 public class VNManager : SingletonMonoBase<VNManager>
 {
+    public CharacterImgController characterImgController;
+
     #region variables
     public GameObject gamePanel;
     public GameObject dialogueBox;
@@ -45,6 +47,7 @@ public class VNManager : SingletonMonoBase<VNManager>
     historyButton,settingsButton,homeButton,closeButton;   
     private bool isAutoPlay = false;
     private bool isSkip = false;
+    private bool isLoad = false;
 
     private int maxReachedLineIndex = 0;
     //全局存储每个文件的最远行索引 string:fileName, int:maxReachedLineIndex
@@ -54,6 +57,12 @@ public class VNManager : SingletonMonoBase<VNManager>
     private string saveFolderPath;
     private byte[] screenshotData;          //保存截图数据
     private string currentSpeakingContent;  //保存当前对话内容
+
+    /// <summary>
+    /// string:chracterImgName, string:chracterImgLastPos
+    /// </summary>
+    Dictionary<string, string> characterImgLoadDicts = new Dictionary<string, string>();
+
     #endregion
 
     #region life cycle
@@ -93,7 +102,7 @@ public class VNManager : SingletonMonoBase<VNManager>
 
     public void startGame()
     {
-        InitializeAndLoadStory(Constants.DEFAULT_STORY_FILE_NAME);
+        InitializeAndLoadStory(Constants.DEFAULT_STORY_FILE_NAME,Constants.DEFAULT_START_LINE);
     }
     private void bottomButtonsAddListener()
     {
@@ -107,16 +116,23 @@ public class VNManager : SingletonMonoBase<VNManager>
     
     }
 
-    private void InitializeAndLoadStory(string defaultStoryFileName)
+    private void InitializeAndLoadStory(string fileName,int lineIndex)
     {
-        Initialize();
-        loadStoryFromFile(defaultStoryFileName);
+        Initialize(lineIndex);
+        loadStoryFromFile(fileName);
+        if(isLoad)
+        {
+            RecoverLastBgAndCharcter();
+            DisplayNextLine();          //FIXME：自己修改部分可能会出现问题，完成读取文本内容
+            isLoad = false;
+        }
+
         DisplayNextLine();
     }
 
-    private void Initialize()
+    private void Initialize(int lineIndex)
     {
-        currentLine= Constants.DEFAULT_START_LINE;
+        currentLine= lineIndex;
 
         backgroundImage.gameObject.SetActive(false);
         backgroundMusic.gameObject.SetActive(false);
@@ -250,9 +266,9 @@ public class VNManager : SingletonMonoBase<VNManager>
         choiceButton2.onClick.RemoveAllListeners();
         choicePanel.SetActive(true);
         choiceButton1.GetComponentInChildren<TextMeshProUGUI>().text = data.speakingContent;
-        choiceButton1.onClick.AddListener(() => InitializeAndLoadStory(data.avatorImageFileName));
+        choiceButton1.onClick.AddListener(() => InitializeAndLoadStory(data.avatorImageFileName,Constants.DEFAULT_START_LINE));
         choiceButton2.GetComponentInChildren<TextMeshProUGUI>().text = data.vocalAudioFileName;
-        choiceButton2.onClick.AddListener(() => InitializeAndLoadStory(data.bgImageFileName));
+        choiceButton2.onClick.AddListener(() => InitializeAndLoadStory(data.bgImageFileName,Constants.DEFAULT_START_LINE));
     }
     #endregion
 
@@ -271,8 +287,6 @@ public class VNManager : SingletonMonoBase<VNManager>
     
     private void UpdateCharacterImage( string Action, string imageFileName, Image characterImage)
     {
-        
-
         if(Action.StartsWith(Constants.CHARACTERACTION_APPEARAT))
         {
             float imgPositionX = CalImgPositionX(Action,
@@ -286,7 +300,7 @@ public class VNManager : SingletonMonoBase<VNManager>
                 Vector2 newPosition = new Vector2(imgPositionX,
                     characterImage.rectTransform.anchoredPosition.y);
                 characterImage.rectTransform.anchoredPosition = newPosition;
-                characterImage.DOFade(1, Constants.DEFAULT_DURATION_TIME).From(0);
+                characterImage.DOFade(1, isLoad ? 0 :Constants.DEFAULT_DURATION_TIME).From(0);
             }
             else{
                 Debug.LogError(Constants.COORDINATE_MISSING);
@@ -313,6 +327,7 @@ public class VNManager : SingletonMonoBase<VNManager>
                 Debug.LogError(Constants.COORDINATE_MISSING);
             }          
         }
+
     }
 
     //计算角色立绘应该出现的位置坐标
@@ -498,19 +513,29 @@ public class VNManager : SingletonMonoBase<VNManager>
 
     private void SaveGame(int slotIndex)
     {
-        var saveData = new saveData{
+        var saveData = new saveData
+        {
+            saveStoryFileName = currentStoryFileName,
+            savedLine = currentLine - 1,                //currentLine在运行displayThisLine()后加一，
+                                                        // 所以这里保留的是当前正在显示的行索引的下一行，所以要减一
             currentSpeekingContent = currentSpeakingContent,
-            screenshotData = screenshotData
+            characterImgDicts = characterImgController.GetCharcterImgsPositionDic(),
+            savedScreenshotData = screenshotData
         };
         string savePath = Path.Combine(saveFolderPath, slotIndex + Constants.SAVE_FILE_EXTENSION);
-        string json = JsonConvert.SerializeObject(saveData,Formatting.Indented);
-        File.WriteAllText(savePath,json);
+        string json = JsonConvert.SerializeObject(saveData, Formatting.Indented);
+        File.WriteAllText(savePath, json);
     }
+
+    
 
     public class saveData
     {
+        public string saveStoryFileName;        //当前保存的故事文件名
+        public int savedLine;                   //当前保存的行索引
         public string currentSpeekingContent;
-        public byte[] screenshotData;
+        public byte[] savedScreenshotData;
+        public Dictionary<string, string> characterImgDicts;
     }
 
     #endregion
@@ -518,12 +543,55 @@ public class VNManager : SingletonMonoBase<VNManager>
     #region load
     private void OnLoadButtonClick()
     {
-        SaveLoadManager.Instance.showLoadPanel(LoadGame);
+        ShowLoadPanel(null);
+    }
+
+    internal void ShowLoadPanel(Action action)
+    {
+        SaveLoadManager.Instance.showLoadPanel(LoadGame,action);
     }
 
     private void LoadGame(int slotIndex)
     {
+        string savePath = Path.Combine(saveFolderPath, slotIndex + Constants.SAVE_FILE_EXTENSION);
+        if(File.Exists(savePath))
+        {
+            isLoad = true;
+            string json = File.ReadAllText(savePath);
+            saveData saveData = JsonConvert.DeserializeObject<saveData>(json);
+            int lineIndex = saveData.savedLine;
+            characterImgLoadDicts = saveData.characterImgDicts;
+            InitializeAndLoadStory(saveData.saveStoryFileName,lineIndex);
+        }
+    }
 
+    private void RecoverLastBgAndCharcter()
+    {
+        var data = storyData[currentLine];
+        if(NotNullOrEmpty(data.lastBgImg))
+        {
+            UpdateBackgroundImage(data.lastBgImg);
+        }
+        if(NotNullOrEmpty(data.lastBgMusic))
+        {
+            PlayBackgroundMusic(data.lastBgMusic);
+        }
+        
+        if(characterImgLoadDicts != null)
+        {
+            foreach(var ChracterImg in characterImgLoadDicts)
+            {
+                int characterImgIndex = characterImgController.GetChracterImgIndexByName(characterImageArr, ChracterImg.Key);
+                if(characterImgIndex != Constants.DEFAULT_UNEXiST_NUMBER)
+                {
+                    UpdateCharacterImage(ChracterImg.Value,ChracterImg.Key,characterImageArr[characterImgIndex]);
+                }
+                else{
+                    Debug.LogError(ChracterImg.Key);
+                }
+            }
+        }
+        
     }
     #endregion
 
@@ -551,6 +619,9 @@ public class VNManager : SingletonMonoBase<VNManager>
         dialogueBox.SetActive(false);
         bottomButtonsPanel.SetActive(false);
     }
+
+    
+
     #endregion
 
     #endregion

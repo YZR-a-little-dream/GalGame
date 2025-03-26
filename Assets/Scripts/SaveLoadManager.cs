@@ -21,6 +21,7 @@ public class SaveLoadManager : SingletonMonoBase<SaveLoadManager>
 
     private int currentPageIndex = Constants.DEFAULT_START_INDEX;
     private Action<int> currentAction;
+    private Action menuAction;
 
     private void Start()
     {
@@ -48,11 +49,12 @@ public class SaveLoadManager : SingletonMonoBase<SaveLoadManager>
         saveLoadPanel.SetActive(true);
     }
 
-    public void showLoadPanel(Action<int> action)
+    public void showLoadPanel(Action<int> action,System.Action menuAction)
     {
         this.isSave = false;
         panelTitle.text = Constants.LOAD_GAME;
         currentAction = action;
+        this.menuAction = menuAction;
         UpdateSaveLoadUI();
         saveLoadPanel.SetActive(true);
     }
@@ -82,7 +84,7 @@ public class SaveLoadManager : SingletonMonoBase<SaveLoadManager>
         string savePath = GenetateDataPath(slotIndex);
         bool fileExists = File.Exists(savePath);
 
-        if(fileExists)
+        if(!isSave && !fileExists)       //如果是记载游戏并且存档不存在，存档不可互动
         {
             slotBtn.interactable = false;
         }
@@ -99,10 +101,14 @@ public class SaveLoadManager : SingletonMonoBase<SaveLoadManager>
 
     private void OnButtonClick(Button slotBtn, int slotIndex)
     {
+        menuAction?.Invoke();
         currentAction?.Invoke(slotIndex);
         if(isSave)
         {
             LoadstorylineAndScreenshots(slotBtn,slotIndex);
+        }
+        else{
+            GoBack();
         }
     }
 
@@ -127,16 +133,16 @@ public class SaveLoadManager : SingletonMonoBase<SaveLoadManager>
 
     private void LoadstorylineAndScreenshots(Button slotBtn, int slotIndex)
     {
-        //TODO: load storyline and screenshotss
+        // load storyline and screenshotss
         string savePath = GenetateDataPath(slotIndex);
         if(File.Exists(savePath))
         {
             string json = File.ReadAllText(savePath);
             var saveData = JsonConvert.DeserializeObject<VNManager.saveData>(json);
-            if(saveData.screenshotData != null)
+            if(saveData.savedScreenshotData != null)
             {
                 Texture2D screenshot = new Texture2D(2,2);
-                screenshot.LoadImage(saveData.screenshotData);
+                screenshot.LoadImage(saveData.savedScreenshotData);
                 slotBtn.GetComponentInChildren<RawImage>().texture = screenshot;
             }
             if(saveData.currentSpeekingContent != null)
@@ -151,4 +157,6 @@ public class SaveLoadManager : SingletonMonoBase<SaveLoadManager>
 
     private string GenetateDataPath(int slotIndex)
         => Path.Combine(Application.persistentDataPath, Constants.SAVE_FILE_PATH, slotIndex + Constants.SAVE_FILE_EXTENSION);
+
+    private void GoBack() => saveLoadPanel.SetActive(false);
 }
