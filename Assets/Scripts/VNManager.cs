@@ -63,6 +63,8 @@ public class VNManager : SingletonMonoBase<VNManager>
     /// </summary>
     Dictionary<string, string> characterImgLoadDicts = new Dictionary<string, string>();
 
+    //历史记录
+    private LinkedList<string> historyRecords = new LinkedList<string>();
     #endregion
 
     #region life cycle
@@ -76,18 +78,40 @@ public class VNManager : SingletonMonoBase<VNManager>
     {
         if(!MenuManager.Instance.menuPanel.activeSelf &&
             !SaveLoadManager.Instance.saveLoadPanel.activeSelf &&
-            gamePanel.activeSelf && Input.GetMouseButtonDown(0))
+            !HistoryManager.Instance.historyScrollView.activeSelf &&
+            gamePanel.activeSelf  )
         {
-            if(!dialogueBox.activeSelf)
+            if(Input.GetMouseButtonDown(0) || Input.GetKeyDown(KeyCode.Space))
             {
-                OpenGameUI();
-            }                
-            else if(!IsHittingBottomButtons())
-            {
-                DisplayNextLine();
+                if(!dialogueBox.activeSelf)
+                {
+                    OpenGameUI();
+                }                
+                else if(!IsHittingBottomButtons())
+                {
+                    DisplayNextLine();
+                }
             }
+
+            if(Input.GetKeyDown(KeyCode.Escape))
+            {
+                if(dialogueBox.activeSelf)   
+                {
+                    CloseGameUI();
+                }
+                else{
+                    OpenGameUI();
+                }
+            }
+
+            if(Input.GetKeyDown(KeyCode.LeftControl) || Input.GetKeyDown(KeyCode.RightControl))
+            {
+                Debug.Log("按下Ctrl按键");
+                CtrlSkip();
+            } 
         }
     }
+
     #endregion
 
     #region Initalize
@@ -110,6 +134,7 @@ public class VNManager : SingletonMonoBase<VNManager>
         skipButton.onClick.AddListener(OnSkipButtonClick);
         saveButton.onClick.AddListener(OnSaveButtonClick);
         loadButton.onClick.AddListener(OnLoadButtonClick);
+        historyButton.onClick.AddListener(OnHistoryClick);
 
         homeButton.onClick.AddListener(OnHomeButtonClick);
         closeButton.onClick.AddListener(OnCloseButtonClick);
@@ -222,6 +247,9 @@ public class VNManager : SingletonMonoBase<VNManager>
         currentSpeakingContent = data.speakingContent;
         typeWriterEffect.StartTyping(currentSpeakingContent,currentTypingSpeed);
         
+        //记录历史文本
+        RecordHistory(speakerName.text,currentSpeakingContent);
+
         if(NotNullOrEmpty(data.avatorImageFileName))
         {
             UpdateAvatarImage(data.avatorImageFileName);
@@ -254,6 +282,17 @@ public class VNManager : SingletonMonoBase<VNManager>
         }
 
         currentLine++;
+    }
+
+    private void RecordHistory(string speaker, string currentSpeakingContent)
+    {
+        string historyRecord = speaker + Constants.COLON + currentSpeakingContent;
+        if(historyRecords.Count > Constants.DEFAULT_MAX_LENGTH)
+        {
+            historyRecords.RemoveFirst();       //移除队列头部元素
+        }
+
+        historyRecords.AddLast(historyRecord);
     }
 
     #endregion
@@ -500,6 +539,23 @@ public class VNManager : SingletonMonoBase<VNManager>
         currentTypingSpeed = Constants.DEFAULT_TYPING_SPEED;
         UpdateButtonImage(Constants.SKIP_OFF,skipButton);
     }
+
+    private void CtrlSkip()
+    {
+        currentTypingSpeed= Constants.DEFAULT_SKIP_MODE_TYPING_SPEED;
+        StartCoroutine(skipWhilePressingCtrl());
+    }
+
+    private IEnumerator skipWhilePressingCtrl()
+    {
+        while(Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl))
+        {
+            DisplayNextLine();
+            //控制快速跳过的节奏
+            yield return new WaitForSeconds(Constants.DEFAULT_SKIP_WAITING_SECONDS);
+        }
+    }
+
     #endregion
     #region save 
     private void OnSaveButtonClick()
@@ -513,6 +569,8 @@ public class VNManager : SingletonMonoBase<VNManager>
 
     private void SaveGame(int slotIndex)
     {
+        historyRecords.RemoveLast();                    //确保存储的时候是保存当前行之前的历史记录
+
         var saveData = new saveData
         {
             saveStoryFileName = currentStoryFileName,
@@ -520,7 +578,8 @@ public class VNManager : SingletonMonoBase<VNManager>
                                                         // 所以这里保留的是当前正在显示的行索引的下一行，所以要减一
             currentSpeekingContent = currentSpeakingContent,
             characterImgDicts = characterImgController.GetCharcterImgsPositionDic(),
-            savedScreenshotData = screenshotData
+            savedScreenshotData = screenshotData,
+            savedHistoryRecords = historyRecords
         };
         string savePath = Path.Combine(saveFolderPath, slotIndex + Constants.SAVE_FILE_EXTENSION);
         string json = JsonConvert.SerializeObject(saveData, Formatting.Indented);
@@ -535,7 +594,9 @@ public class VNManager : SingletonMonoBase<VNManager>
         public int savedLine;                   //当前保存的行索引
         public string currentSpeekingContent;
         public byte[] savedScreenshotData;
-        public Dictionary<string, string> characterImgDicts;
+        public Dictionary<string, string> characterImgDicts;        //人物立绘列表
+
+        public LinkedList<string> savedHistoryRecords;              //历史存档
     }
 
     #endregion
@@ -559,6 +620,7 @@ public class VNManager : SingletonMonoBase<VNManager>
             isLoad = true;
             string json = File.ReadAllText(savePath);
             saveData saveData = JsonConvert.DeserializeObject<saveData>(json);
+            historyRecords = saveData.savedHistoryRecords;
             int lineIndex = saveData.savedLine;
             characterImgLoadDicts = saveData.characterImgDicts;
             InitializeAndLoadStory(saveData.saveStoryFileName,lineIndex);
@@ -594,6 +656,14 @@ public class VNManager : SingletonMonoBase<VNManager>
         
     }
     #endregion
+
+    #region History
+    private void OnHistoryClick()
+    {
+        HistoryManager.Instance.ShowHistory(historyRecords);
+    }
+    #endregion
+
 
     #region Home
      private void OnHomeButtonClick()
