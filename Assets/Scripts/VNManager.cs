@@ -79,6 +79,7 @@ public class VNManager : SingletonMonoBase<VNManager>
         if(!MenuManager.Instance.menuPanel.activeSelf &&
             !SaveLoadManager.Instance.saveLoadPanel.activeSelf &&
             !HistoryManager.Instance.historyScrollView.activeSelf &&
+            !SettingManager.Instance.settingPanel.activeSelf &&
             gamePanel.activeSelf  )
         {
             if(Input.GetMouseButtonDown(0) || Input.GetKeyDown(KeyCode.Space))
@@ -135,7 +136,7 @@ public class VNManager : SingletonMonoBase<VNManager>
         saveButton.onClick.AddListener(OnSaveButtonClick);
         loadButton.onClick.AddListener(OnLoadButtonClick);
         historyButton.onClick.AddListener(OnHistoryClick);
-
+        settingsButton.onClick.AddListener(OnSettingButtonClick);
         homeButton.onClick.AddListener(OnHomeButtonClick);
         closeButton.onClick.AddListener(OnCloseButtonClick);
     
@@ -694,5 +695,11 @@ public class VNManager : SingletonMonoBase<VNManager>
 
     #endregion
 
+    #region Settings
+    private void OnSettingButtonClick()
+    {
+        SettingManager.Instance.ShowSettingPanel();
+    }
+    #endregion
     #endregion
 }

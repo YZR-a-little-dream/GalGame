@@ -55,6 +55,7 @@
     <Compile Include="Assets\Scripts\Constants.cs" />
     <Compile Include="Assets\Scripts\MenuManager.cs" />
     <Compile Include="Assets\Scripts\HistoryManager.cs" />
+    <Compile Include="Assets\Scripts\SettingManager.cs" />
     <Compile Include="Assets\Scripts\SaveLoadManager.cs" />
     <Compile Include="Assets\Scripts\CSVReader\CSVReader.cs" />
     <Compile Include="Assets\Scripts\test.cs" />

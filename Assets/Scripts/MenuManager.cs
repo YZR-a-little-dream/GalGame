@@ -53,12 +53,17 @@ public class MenuManager : SingletonMonoBase<MenuManager>
 
     private void OpenSettings()
     {
-        //TODO: 实现设置界面功能
-        
+        //实现设置界面功能
+        SettingManager.Instance.ShowSettingPanel();
     }
 
     private void ExitGame()
     {
+        #if UNITY_EDITOR
+            UnityEditor.EditorApplication.isPlaying = false;    // 编辑器模式下停止播放
+        #else
+            Application.Quit();                                 // 构建后退出应用
+        #endif
     }
 
     private void ShowGamePanel()

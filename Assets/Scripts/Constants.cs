@@ -62,4 +62,8 @@ public class Constants : MonoBehaviour
 
     public static int DEFAULT_MAX_LENGTH = 50;
 
+    public static string RESOLUTION = "Resolution";
+    public static string FULLSCREEN = "Fullscreen" ;
+    public static string WINDIW = "Window";
+
 }
