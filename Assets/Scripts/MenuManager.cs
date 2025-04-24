@@ -10,6 +10,7 @@ public class MenuManager : SingletonMonoBase<MenuManager>
     public Button startButton;
     public Button continueButton;
     public Button loadButton;
+    public Button galleryButton;
     public Button settingsButton;
     public Button exitButton;
 
@@ -25,6 +26,7 @@ public class MenuManager : SingletonMonoBase<MenuManager>
         startButton.onClick.AddListener(StartGame);
         continueButton.onClick.AddListener(ContinueGame);
         loadButton.onClick.AddListener(LoadGame);
+        galleryButton.onClick.AddListener(ShowGalleryPanel);
         settingsButton.onClick.AddListener(OpenSettings);
         exitButton.onClick.AddListener(ExitGame);
     }
@@ -49,6 +51,12 @@ public class MenuManager : SingletonMonoBase<MenuManager>
     {
         //实现加载游戏功能
         VNManager.Instance.ShowLoadPanel(ShowGamePanel);
+    }
+
+    private void ShowGalleryPanel()
+    {
+        //GalleryManager
+        GalleryManager.Instance.ShowGalleryPanel();
     }
 
     private void OpenSettings()

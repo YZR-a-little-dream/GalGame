@@ -65,6 +65,9 @@ public class VNManager : SingletonMonoBase<VNManager>
 
     //历史记录
     private LinkedList<string> historyRecords = new LinkedList<string>();
+
+    //保存已解锁的背景
+    public HashSet<string> unlockedBGHashSets = new HashSet<string>();
     #endregion
 
     #region life cycle
@@ -323,6 +326,10 @@ public class VNManager : SingletonMonoBase<VNManager>
     {
         string bgImagePath = Constants.BACKGROUND_PATH + bgImageFileName;
         UpdateImage(bgImagePath,backgroundImage);
+        if(!unlockedBGHashSets.Contains(bgImageFileName))
+        {
+            unlockedBGHashSets.Add(bgImageFileName);
+        }
     }
     
     private void UpdateCharacterImage( string Action, string imageFileName, Image characterImage)
@@ -367,7 +374,6 @@ public class VNManager : SingletonMonoBase<VNManager>
                 Debug.LogError(Constants.COORDINATE_MISSING);
             }          
         }
-
     }
 
     //计算角色立绘应该出现的位置坐标

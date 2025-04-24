@@ -1,3 +1,4 @@
+using System;
 using JetBrains.Annotations;
 using UnityEngine;
 
@@ -15,6 +16,7 @@ public class Constants : MonoBehaviour
     public static string BACKGROUND_PATH = "image/background/";
     public static string AVATAR_PATH = "image/avatar/";
     public static string CHARACTER_PATH = "image/character/";
+    public static string THUMBNATL_PATH = "image/thumbnail/";        //缩略图
     public static string BUTTON_PATH = "image/button/";
     public static string VOCAL_PATH = "audio/vocal/";
     public static string MUSIC_PATH = "audio/music/";
@@ -23,6 +25,7 @@ public class Constants : MonoBehaviour
     public static string AUDIO_LOAD_FAILED = "Failed to load audio file: ";
     public static string MUSIC_LOAD_FAILED = "Failed to load music file: ";
     public static string IMAGE_LOAD_FAILED = "Failed to load image file: ";
+    public static string BIG_IMAGE_LOAD_FAILED = "Failed to load big image : ";
 
     public static string NO_DATA_FOUND = "NO data found";
     public static string END_OF_STORY = "End of story";
@@ -66,4 +69,13 @@ public class Constants : MonoBehaviour
     public static string FULLSCREEN = "Fullscreen" ;
     public static string WINDIW = "Window";
 
+    public static int GALLERY_SLOTS_PER_PAGE = 9;
+
+    //其他背景文件名
+    public static String[] ALL_BACKGROUNDS = 
+    {
+        "1","2","3","4","c_青空","c_青空2","c_青空3","c_月01","c_月03","c_月04","c_月05"
+    };
+    public static string GALLERY = "Gallery";
+    public static string GALLERY_PACEHOLDER = "gallery_placeholder";
 }

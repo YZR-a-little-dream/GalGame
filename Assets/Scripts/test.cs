@@ -1,24 +1,22 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class test : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
+     private void Start() {
+        testHandler(test1);
+    }
+
+    public void testHandler(Action<string> a)
     {
+        a("1");
         
     }
 
-    private void OnEnable() {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
+    private void test1(string a)
     {
-        
-    }
-
-    
+        print("I'm test");
+    }    
 }
