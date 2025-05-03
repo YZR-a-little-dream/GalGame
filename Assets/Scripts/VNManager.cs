@@ -247,8 +247,15 @@ public class VNManager : SingletonMonoBase<VNManager>
     private void displayThisLine()
     {
         var data = storyData[currentLine];
-        speakerName.text = data.speakerName;
-        currentSpeakingContent = data.speakingContent;
+
+        string playerName = PlayerData.Instance.playerName;
+        string speaker = data.speakerName.Replace(Constants.NAME_PLACEHOLDER,playerName);
+        string content = data.speakingContent.Replace(Constants.NAME_PLACEHOLDER,playerName);
+        speakerName.text = speaker;
+        currentSpeakingContent = content;
+
+        // speakerName.text = data.speakerName;
+        // currentSpeakingContent = data.speakingContent;
         typeWriterEffect.StartTyping(currentSpeakingContent,currentTypingSpeed);
         
         //记录历史文本
@@ -586,7 +593,8 @@ public class VNManager : SingletonMonoBase<VNManager>
             currentSpeekingContent = currentSpeakingContent,
             characterImgDicts = characterImgController.GetCharcterImgsPositionDic(),
             savedScreenshotData = screenshotData,
-            savedHistoryRecords = historyRecords
+            savedHistoryRecords = historyRecords,
+            savedPlayerNmae = PlayerData.Instance.playerName
         };
         string savePath = Path.Combine(saveFolderPath, slotIndex + Constants.SAVE_FILE_EXTENSION);
         string json = JsonConvert.SerializeObject(saveData, Formatting.Indented);
@@ -604,6 +612,8 @@ public class VNManager : SingletonMonoBase<VNManager>
         public Dictionary<string, string> characterImgDicts;        //人物立绘列表
 
         public LinkedList<string> savedHistoryRecords;              //历史存档
+        public string savedPlayerNmae;
+        
     }
 
     #endregion
@@ -627,8 +637,12 @@ public class VNManager : SingletonMonoBase<VNManager>
             isLoad = true;
             string json = File.ReadAllText(savePath);
             saveData saveData = JsonConvert.DeserializeObject<saveData>(json);
+
             historyRecords = saveData.savedHistoryRecords;
             int lineIndex = saveData.savedLine;
+
+            PlayerData.Instance.playerName = saveData.savedPlayerNmae;
+
             characterImgLoadDicts = saveData.characterImgDicts;
             InitializeAndLoadStory(saveData.saveStoryFileName,lineIndex);
         }

@@ -23,7 +23,8 @@ public class MenuManager : SingletonMonoBase<MenuManager>
 
     private void menuButtonsAddListener()
     {
-        startButton.onClick.AddListener(StartGame);
+        //startButton.onClick.AddListener(StartGame);
+        startButton.onClick.AddListener(ShowInputPanel);
         continueButton.onClick.AddListener(ContinueGame);
         loadButton.onClick.AddListener(LoadGame);
         galleryButton.onClick.AddListener(ShowGalleryPanel);
@@ -31,7 +32,12 @@ public class MenuManager : SingletonMonoBase<MenuManager>
         exitButton.onClick.AddListener(ExitGame);
     }
 
-    private void StartGame()
+    private void ShowInputPanel()
+    {
+        InputManager.Instance.showInputPanel();
+    }
+
+    public void StartGame()
     {
         hasStarted = true;
         continueButton.interactable = true;

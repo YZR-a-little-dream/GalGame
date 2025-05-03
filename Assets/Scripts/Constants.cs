@@ -78,4 +78,10 @@ public class Constants : MonoBehaviour
     };
     public static string GALLERY = "Gallery";
     public static string GALLERY_PACEHOLDER = "gallery_placeholder";
+
+    public static string CONFIRM = "确认名字";
+    public static string PROMPT_TEXT = "Please Enter Your Name";
+    //public static string DEAFULT_PLAYERNAME = "Player";
+
+    public static string NAME_PLACEHOLDER = "[Name]";
 }
