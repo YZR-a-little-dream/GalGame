@@ -23,8 +23,8 @@ public class MenuManager : SingletonMonoBase<MenuManager>
 
     private void menuButtonsAddListener()
     {
-        //startButton.onClick.AddListener(StartGame);
-        startButton.onClick.AddListener(ShowInputPanel);
+        startButton.onClick.AddListener(StartGame);
+        //startButton.onClick.AddListener(ShowInputPanel);
         continueButton.onClick.AddListener(ContinueGame);
         loadButton.onClick.AddListener(LoadGame);
         galleryButton.onClick.AddListener(ShowGalleryPanel);
@@ -42,7 +42,9 @@ public class MenuManager : SingletonMonoBase<MenuManager>
         hasStarted = true;
         continueButton.interactable = true;
         ShowGamePanel();
-        VNManager.Instance.startGame();
+        //VNManager.Instance.startGame(Constants.DEFAULT_STORY_FILE_NAME,Constants.DEFAULT_START_LINE);
+        //FIXME: this is a test
+        VNManager.Instance.startGame("11",Constants.DEFAULT_START_LINE);
     }
 
     private void ContinueGame()

@@ -32,8 +32,6 @@ public class Constants : MonoBehaviour
     public static string CHOICE = "choice";
 
     public static string CHARACTERACTION_APPEARAT = "appearAt";
-    public static int DEFAULT_APPEARAT_START_POSITION = 9;          //appearAt( 从第9个位置读取数值
-    public static int DEFAULT_APPEARAT_IRRELEVANT_CHAR = 10;   //无关字符数量为10，只读取（x，y）的长度
     public static string CHARACTERACTION_DISAPPEAR = "disappear";
     
     public static string CHARACTERACTION_MOVETO = "moveTo";
@@ -84,4 +82,8 @@ public class Constants : MonoBehaviour
     //public static string DEAFULT_PLAYERNAME = "Player";
 
     public static string NAME_PLACEHOLDER = "[Name]";
+
+    public static string GOTO = "goto";
+    public static string APPEARAT_INSTANTLY = "appearAtInstantly";
+    
 }

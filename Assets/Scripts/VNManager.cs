@@ -128,9 +128,9 @@ public class VNManager : SingletonMonoBase<VNManager>
         }
     }
 
-    public void startGame()
+    public void startGame(string fileName,int defaultStartLine)
     {
-        InitializeAndLoadStory(Constants.DEFAULT_STORY_FILE_NAME,Constants.DEFAULT_START_LINE);
+        InitializeAndLoadStory(fileName,defaultStartLine);
     }
     private void bottomButtonsAddListener()
     {
@@ -225,6 +225,11 @@ public class VNManager : SingletonMonoBase<VNManager>
             if(storyData[currentLine].speakerName.Equals(Constants.CHOICE))
             {
                 showChociePanel();
+            }
+
+            if(storyData[currentLine].speakerName == Constants.GOTO)
+            {
+                InitializeAndLoadStory(storyData[currentLine].speakingContent,Constants.DEFAULT_START_LINE);
             }
             return;
         }
@@ -343,9 +348,7 @@ public class VNManager : SingletonMonoBase<VNManager>
     {
         if(Action.StartsWith(Constants.CHARACTERACTION_APPEARAT))
         {
-            float imgPositionX = CalImgPositionX(Action,
-                Constants.DEFAULT_APPEARAT_START_POSITION,
-                Constants.DEFAULT_APPEARAT_IRRELEVANT_CHAR);
+            float imgPositionX = CalImgPositionX(Action);
 
             if (NotLegalFloatNum(imgPositionX))
             {
@@ -354,7 +357,13 @@ public class VNManager : SingletonMonoBase<VNManager>
                 Vector2 newPosition = new Vector2(imgPositionX,
                     characterImage.rectTransform.anchoredPosition.y);
                 characterImage.rectTransform.anchoredPosition = newPosition;
-                characterImage.DOFade(1, isLoad ? 0 :Constants.DEFAULT_DURATION_TIME).From(0);
+
+                int durarution = Constants.DEFAULT_DURATION_TIME;
+                if(isLoad || Action.StartsWith(Constants.APPEARAT_INSTANTLY) )
+                {
+                    durarution = 0;
+                }
+                characterImage.DOFade(1, durarution).From(0);
             }
             else{
                 Debug.LogError(Constants.COORDINATE_MISSING);
@@ -369,9 +378,7 @@ public class VNManager : SingletonMonoBase<VNManager>
         }
         else if(Action.StartsWith(Constants.CHARACTERACTION_MOVETO))
         {
-            float imgPositionX = CalImgPositionX(Action,
-                Constants.DEFAULT_MOVETO_START_POSITION,
-                Constants.DEFAULT_MOVETO_IRRELEVANT_CHAR);
+            float imgPositionX = CalImgPositionX(Action);
             //移动立绘位置
             if(NotLegalFloatNum(imgPositionX))
             {
@@ -384,15 +391,31 @@ public class VNManager : SingletonMonoBase<VNManager>
     }
 
     //计算角色立绘应该出现的位置坐标
-    private float CalImgPositionX(string Action,int numStartPosition, int IrrelevantChar)
+    private float CalImgPositionX(string Action)
     {
-        ReadOnlySpan<char> span = Action.AsSpan();
-        ReadOnlySpan<char> coordinatesSpan = span.Slice(numStartPosition,span.Length - IrrelevantChar);
-        var coordinates = coordinatesSpan.ToString().Split(',');
+        // ReadOnlySpan<char> span = Action.AsSpan();
+        // ReadOnlySpan<char> coordinatesSpan = span.Slice(numStartPosition,span.Length - IrrelevantChar);
+        // var coordinates = coordinatesSpan.ToString().Split(',');
 
-        float _x = -1;
-        float imgPositionX = float.TryParse(coordinates[0], out _x) ? _x : -1;
-        //float y = float.Parse(coordinates[1]);
+        // float _x = -1;
+        // float imgPositionX = float.TryParse(coordinates[0], out _x) ? _x : -1;
+        // //float y = float.Parse(coordinates[1]);
+        // return imgPositionX;
+
+        ReadOnlySpan<char> span = Action.AsSpan();
+        int openBrace = span.IndexOf('(');
+        int closeBrace = span.IndexOf(')');
+
+        if (openBrace == -1 || closeBrace == -1 || closeBrace <= openBrace)
+            Debug.Log("无效的坐标格式");
+
+        ReadOnlySpan<char> content = span.Slice(openBrace + 1, closeBrace - openBrace - 1);
+
+        string[] coordinates = content.ToString().Split(',');
+
+         float _x = -1;
+         float imgPositionX = float.TryParse(coordinates[0], out _x) ? _x : -1;
+        // //float y = float.Parse(coordinates[1]);
         return imgPositionX;
     }
 
@@ -491,8 +514,6 @@ public class VNManager : SingletonMonoBase<VNManager>
             StartCoroutine(StartAutoPlay());
         }
     }
-
-    
 
     private IEnumerator StartAutoPlay()
     {
