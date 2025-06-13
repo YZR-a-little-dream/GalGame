@@ -1,0 +1,14 @@
+{
+    "start_game": "开始游戏",
+    "continue_game": "继续游戏",
+    "settings": "设置",
+    "gallery": "画廊",
+    "exit_game": "退出游戏",
+    "language": "语言",
+    "save_game": "保存游戏",
+    "load_game": "加载游戏",
+    "empty_slot": "无存档内容",
+    "previous_page": "上一页",
+    "next_page": "下一页",
+    "back": "返回"
+}

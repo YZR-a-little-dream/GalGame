@@ -181,7 +181,11 @@ public class VNManager : SingletonMonoBase<VNManager>
     private void loadStoryFromFile(string fileName)
     {
         currentStoryFileName = fileName;
-        string path = Constants.STORY_PATH + fileName + Constants.DEFAULT_FILE_EXTENSION;
+        //string path = Constants.STORY_PATH + fileName + Constants.DEFAULT_FILE_EXTENSION;
+        string path = Path.Combine(Application.streamingAssetsPath,
+                                    Constants.LANGUAGE_PATH,
+                                    LocalizationManager.Instance.currentLanguage,
+                                    fileName + Constants.DEFAULT_FILE_EXTENSION);
         storyData = ExcelReader.ReadExcel(path);
         
         if(storyData == null || storyData.Count == 0)
@@ -200,6 +204,17 @@ public class VNManager : SingletonMonoBase<VNManager>
     }
     #endregion
     
+    public void SetLanguage()
+    {
+        loadStoryFromFile(currentStoryFileName);
+    }
+
+    public void ReloadStoryLine()
+    {
+        currentLine--;
+        DisplayNextLine();
+    }
+
     #region  Display Line
     private void DisplayNextLine()
     {

@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -13,12 +14,21 @@ public class MenuManager : SingletonMonoBase<MenuManager>
     public Button galleryButton;
     public Button settingsButton;
     public Button exitButton;
+    public Button languagebutton;
 
     private bool hasStarted = false;
+
+    //多语言本地化
+    public TextMeshProUGUI languageBtnText;
+    private string currentLanguage;
+    private int lastLanguageIndex = Constants.DEFAULE_LANGUAGE_INDEX;
+    private int currentLanguageIndex = Constants.DEFAULE_LANGUAGE_INDEX;
 
     private void Start() {
         continueButton.interactable = false;
         menuButtonsAddListener();
+        LocalizationManager.Instance.LoadLanguage(Constants.DEFAULT_LANGUAGE);
+        updateLanguageBtnText();
     }
 
     private void menuButtonsAddListener()
@@ -30,6 +40,7 @@ public class MenuManager : SingletonMonoBase<MenuManager>
         galleryButton.onClick.AddListener(ShowGalleryPanel);
         settingsButton.onClick.AddListener(OpenSettings);
         exitButton.onClick.AddListener(ExitGame);
+        languagebutton.onClick.AddListener(UpdateLanguage);
     }
 
     private void ShowInputPanel()
@@ -41,24 +52,42 @@ public class MenuManager : SingletonMonoBase<MenuManager>
     {
         hasStarted = true;
         continueButton.interactable = true;
+        if(lastLanguageIndex != currentLanguageIndex)
+        {
+            SetLanguage();
+        }
+        
+        VNManager.Instance.startGame(Constants.DEFAULT_STORY_FILE_NAME,Constants.DEFAULT_START_LINE);
         ShowGamePanel();
-        //VNManager.Instance.startGame(Constants.DEFAULT_STORY_FILE_NAME,Constants.DEFAULT_START_LINE);
-        //FIXME: this is a test
-        VNManager.Instance.startGame("11",Constants.DEFAULT_START_LINE);
     }
 
     private void ContinueGame()
     {
         if(hasStarted)
         {
+            if(lastLanguageIndex != currentLanguageIndex)
+            {
+                SetLanguage();
+                VNManager.Instance.ReloadStoryLine();
+            }
             ShowGamePanel();
         }
     }
 
     private void LoadGame()
     {
+        if(lastLanguageIndex != currentLanguageIndex)
+        {
+            SetLanguage();
+        }
         //实现加载游戏功能
         VNManager.Instance.ShowLoadPanel(ShowGamePanel);
+    }
+
+    private void SetLanguage()
+    {
+        lastLanguageIndex = currentLanguageIndex;
+        VNManager.Instance.SetLanguage();
     }
 
     private void ShowGalleryPanel()
@@ -80,6 +109,31 @@ public class MenuManager : SingletonMonoBase<MenuManager>
         #else
             Application.Quit();                                 // 构建后退出应用
         #endif
+    }
+
+    private void UpdateLanguage()
+    {
+        currentLanguageIndex = (currentLanguageIndex + 1) % Constants.LANGUAGES.Length;
+        currentLanguage = Constants.LANGUAGES[currentLanguageIndex];
+        LocalizationManager.Instance.LoadLanguage(currentLanguage);
+        updateLanguageBtnText();
+    }
+
+    private void updateLanguageBtnText()
+    {
+        switch(currentLanguageIndex)
+        {
+            case 0 :
+                languageBtnText.text = Constants.CHINESE;
+                break;
+            case 1:
+                languageBtnText.text = Constants.ENGLISH;
+                break;
+            case 2: 
+                languageBtnText.text = Constants.JAPANESE;
+                break;
+        }
+
     }
 
     private void ShowGamePanel()
