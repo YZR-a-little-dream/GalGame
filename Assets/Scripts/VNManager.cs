@@ -63,11 +63,25 @@ public class VNManager : SingletonMonoBase<VNManager>
     /// </summary>
     Dictionary<string, string> characterImgLoadDicts = new Dictionary<string, string>();
 
-    //历史记录
-    private LinkedList<string> historyRecords = new LinkedList<string>();
-
     //保存已解锁的背景
     public HashSet<string> unlockedBGHashSets = new HashSet<string>();
+
+    //历史记录
+    private LinkedList<string> historyRecords = new LinkedList<string>();
+    
+    //本地化
+    // public class historyData
+    // {
+    //     public string chineseName;
+    //     public string chineseContent;
+    //     public string englishName;
+    //     public string englishContent;
+    //     public string japaneseName;
+    //     public string japaneseContent;
+    // }
+
+    //private LinkedList<historyData> historyRecords;
+
     #endregion
 
     #region life cycle
@@ -161,20 +175,21 @@ public class VNManager : SingletonMonoBase<VNManager>
 
     private void Initialize(int lineIndex)
     {
-        currentLine= lineIndex;
+        currentLine = lineIndex;
 
         backgroundImage.gameObject.SetActive(false);
         backgroundMusic.gameObject.SetActive(false);
 
         avatorImage.gameObject.SetActive(false);
         vocalAudio.gameObject.SetActive(false);
-        
+
         foreach (var img in characterImageArr)
         {
             img.gameObject.SetActive(false);
         }
 
         choicePanel.SetActive(false);
+        //historyRecords = new LinkedList<historyData>();
     }
     
 
@@ -211,6 +226,7 @@ public class VNManager : SingletonMonoBase<VNManager>
 
     public void ReloadStoryLine()
     {
+        historyRecords.RemoveLast();        //移除最后一条记录
         currentLine--;
         DisplayNextLine();
     }

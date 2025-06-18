@@ -21,7 +21,12 @@ public class ExcelReader : MonoBehaviour
         public string characterImgFileName;     //角色立绘
 
         public string lastBgImg;
-        public string lastBgMusic; 
+        public string lastBgMusic;
+        public string englishName;
+        public string englishContent;
+        public string japaneseName;
+        public string japaneseContent;
+
     }
 
     public static List<ExcelData> ReadExcel(string filepath)
@@ -35,7 +40,7 @@ public class ExcelReader : MonoBehaviour
             {
                 do
                 {
-                    while(reader.Read())
+                    while (reader.Read())
                     {
                         int num = 0;
                         ExcelData data = new ExcelData();
@@ -45,14 +50,18 @@ public class ExcelReader : MonoBehaviour
                         data.vocalAudioFileName = reader.IsDBNull(3) ? string.Empty : reader.GetValue(3)?.ToString();
                         data.bgImageFileName = reader.IsDBNull(4) ? string.Empty : reader.GetValue(4)?.ToString();
                         data.bgMusicFileName = reader.IsDBNull(5) ? string.Empty : reader.GetValue(5)?.ToString();
-                        data.characterNum = reader.IsDBNull(6) ? 
-                        0 : 
-                        int.TryParse(reader.GetValue(6)?.ToString() , out num) ? num : Constants.DEFAULT_UNEXiST_NUMBER;
+                        data.characterNum = reader.IsDBNull(6) ?
+                        0 :
+                        int.TryParse(reader.GetValue(6)?.ToString(), out num) ? num : Constants.DEFAULT_UNEXiST_NUMBER;
                         data.characterAction = reader.IsDBNull(7) ? string.Empty : reader.GetValue(7)?.ToString();
                         data.characterImgFileName = reader.IsDBNull(8) ? string.Empty : reader.GetValue(8)?.ToString();
                         data.lastBgImg = reader.IsDBNull(9) ? string.Empty : reader.GetValue(9)?.ToString();
                         data.lastBgMusic = reader.IsDBNull(10) ? string.Empty : reader.GetValue(10)?.ToString();
-                        excelData.Add(data);
+                        data.englishName = reader.IsDBNull(11) ? string.Empty : reader.GetValue(11)?.ToString();
+                        data.englishContent = reader.IsDBNull(12) ? string.Empty : reader.GetValue(12)?.ToString();
+                        data.japaneseName = reader.IsDBNull(13) ? string.Empty : reader.GetValue(13)?.ToString();
+                        data.japaneseContent = reader.IsDBNull(14) ? string.Empty : reader.GetValue(14)?.ToString();
+                        excelData.Add(data);            
                     }
                 }while(reader.NextResult());
             }
