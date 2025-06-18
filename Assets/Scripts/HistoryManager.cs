@@ -26,14 +26,19 @@ public class HistoryManager : SingletonMonoBase<HistoryManager>
         {
             Destroy(child.gameObject);
         }
-        //显示新的历史记录
+        
         historyRecords = records;
         LinkedListNode<string> currentNode = historyRecords.Last;
-        while (currentNode!= null)
+        
+        Debug.Log(currentNode.Value);
+
+        //显示新的历史记录
+        while (currentNode != null)
         {
             AddHistoryItem(currentNode.Value);
             currentNode = currentNode.Previous;
         }
+        
         historyContent.GetComponent<RectTransform>().localPosition = Vector3.zero;
         historyScrollView.SetActive(true);
     }

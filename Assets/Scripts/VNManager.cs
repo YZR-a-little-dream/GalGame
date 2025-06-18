@@ -67,7 +67,7 @@ public class VNManager : SingletonMonoBase<VNManager>
     public HashSet<string> unlockedBGHashSets = new HashSet<string>();
 
     //历史记录
-    private LinkedList<string> historyRecords = new LinkedList<string>();
+    public LinkedList<string> historyRecords = new LinkedList<string>();
     
     //本地化
     // public class historyData
@@ -218,6 +218,7 @@ public class VNManager : SingletonMonoBase<VNManager>
         }
     }
     #endregion
+
     
     public void SetLanguage()
     {
@@ -226,15 +227,16 @@ public class VNManager : SingletonMonoBase<VNManager>
 
     public void ReloadStoryLine()
     {
-        historyRecords.RemoveLast();        //移除最后一条记录
+        //historyRecords.RemoveLast();        //移除最后一条记录
+        //从当前语言的语句为初始记录
         currentLine--;
         DisplayNextLine();
     }
 
     #region  Display Line
     private void DisplayNextLine()
-    {
-        if(currentLine > maxReachedLineIndex)
+    {        
+        if (currentLine > maxReachedLineIndex)
         {
             maxReachedLineIndex = currentLine;
             globalMaxReachedLineIndicesDict[currentStoryFileName] = maxReachedLineIndex;
@@ -271,12 +273,14 @@ public class VNManager : SingletonMonoBase<VNManager>
             return;
         }
 
-        if(typeWriterEffect.IsTyping())
+        if (typeWriterEffect.IsTyping())
         {
             typeWriterEffect.CompleteLine();
         }
-        else{
+        else
+        {
             displayThisLine();
+            
         }
     }
 

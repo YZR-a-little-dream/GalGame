@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -88,7 +89,16 @@ public class MenuManager : SingletonMonoBase<MenuManager>
     {
         lastLanguageIndex = currentLanguageIndex;
         VNManager.Instance.SetLanguage();
+        
+        //清空之前语言的历史记录
+        VNManager.Instance.historyRecords.Clear();
+        //清空现有历史记录
+        foreach (Transform child in HistoryManager.Instance.historyContent)
+        {
+            Destroy(child.gameObject);
+        }
     }
+    
 
     private void ShowGalleryPanel()
     {

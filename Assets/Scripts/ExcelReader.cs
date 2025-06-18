@@ -57,10 +57,6 @@ public class ExcelReader : MonoBehaviour
                         data.characterImgFileName = reader.IsDBNull(8) ? string.Empty : reader.GetValue(8)?.ToString();
                         data.lastBgImg = reader.IsDBNull(9) ? string.Empty : reader.GetValue(9)?.ToString();
                         data.lastBgMusic = reader.IsDBNull(10) ? string.Empty : reader.GetValue(10)?.ToString();
-                        data.englishName = reader.IsDBNull(11) ? string.Empty : reader.GetValue(11)?.ToString();
-                        data.englishContent = reader.IsDBNull(12) ? string.Empty : reader.GetValue(12)?.ToString();
-                        data.japaneseName = reader.IsDBNull(13) ? string.Empty : reader.GetValue(13)?.ToString();
-                        data.japaneseContent = reader.IsDBNull(14) ? string.Empty : reader.GetValue(14)?.ToString();
                         excelData.Add(data);            
                     }
                 }while(reader.NextResult());
