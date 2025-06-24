@@ -60,9 +60,11 @@
     <Compile Include="Assets\Scripts\HistoryManager.cs" />
     <Compile Include="Assets\Scripts\SettingManager.cs" />
     <Compile Include="Assets\Scripts\Localized\LocalizationManager.cs" />
+    <Compile Include="Assets\Scripts\Manager\IntroManager.cs" />
     <Compile Include="Assets\Scripts\InputManager.cs" />
     <Compile Include="Assets\Scripts\CSVReader\CSVReader.cs" />
     <Compile Include="Assets\Scripts\test.cs" />
+    <Compile Include="Assets\Scripts\Controller\FadeInEffect.cs" />
     <Compile Include="Assets\Scripts\UI\SaveLoadManager.cs" />
     <Compile Include="Assets\Scripts\CharacterImgController.cs" />
   </ItemGroup>
