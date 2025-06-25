@@ -99,6 +99,8 @@ public class Constants : MonoBehaviour
     public static string[] LANGUAGES = { "zh", "en", "ja" };
 
     #region  IntroManger
-    public static string videoPath = "video/spring.mp4";
+    public static string videoPath = "video";
+    public static string VIDEO_FILE_EXTENSION = ".mp4";
+    public static string MENU_SCENE = "MenuScene";
     #endregion
 }

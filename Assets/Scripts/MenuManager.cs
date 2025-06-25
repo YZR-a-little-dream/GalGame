@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using TMPro;
 using UnityEngine;
@@ -9,6 +10,8 @@ using UnityEngine.UI;
 public class MenuManager : SingletonMonoBase<MenuManager>
 {
     public GameObject menuPanel;
+    public Image backgroundImage;
+    
     public Button startButton;
     public Button continueButton;
     public Button loadButton;
@@ -25,11 +28,29 @@ public class MenuManager : SingletonMonoBase<MenuManager>
     private int lastLanguageIndex = Constants.DEFAULE_LANGUAGE_INDEX;
     private int currentLanguageIndex = Constants.DEFAULE_LANGUAGE_INDEX;
 
-    private void Start() {
+    private void Start()
+    {
         continueButton.interactable = false;
         menuButtonsAddListener();
         LocalizationManager.Instance.LoadLanguage(Constants.DEFAULT_LANGUAGE);
         updateLanguageBtnText();
+
+        //用属性代替静态方法
+        string lastPlayedVideo = IntroManager.lastPlayedVideo;
+        if (!string.IsNullOrEmpty(lastPlayedVideo))
+        {
+            string videoFileName = Path.GetFileNameWithoutExtension(lastPlayedVideo);
+            string imagePath = Constants.BACKGROUND_PATH + videoFileName;
+            Sprite sprite = Resources.Load<Sprite>(imagePath);
+            if (sprite != null)
+            {
+                backgroundImage.sprite = sprite;
+            }
+            else
+            {
+                Debug.LogWarning(Constants.IMAGE_LOAD_FAILED + imagePath);
+            }
+        }
     }
 
     private void menuButtonsAddListener()
