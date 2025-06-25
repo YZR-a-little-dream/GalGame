@@ -8,9 +8,9 @@ public class FadeInEffect : MonoBehaviour
 {
     public Image target;
     public float fadeDuration = 2.0f;
+    public bool FadeIn = true;
     private void Start()
     {
-        bool FadeIn = true;
         SetAlpha(FadeIn);
     }
 
