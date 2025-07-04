@@ -3,11 +3,11 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class SettingManager : SingletonMonoBase<SettingManager>
 {
-    public GameObject settingPanel;
     public Toggle fullscreenToggle;
     public Text toggleLabel;
     public TMP_Dropdown resolutionDropdown;
@@ -21,14 +21,16 @@ public class SettingManager : SingletonMonoBase<SettingManager>
     private void Start() {
         InitializeResolution();
         fullscreenToggle.isOn = Screen.fullScreenMode == FullScreenMode.FullScreenWindow;
-        UPdateToggleLabel(fullscreenToggle.isOn);
+        UpdateToggleLabel(fullscreenToggle.isOn);
+
+        defaultButton.GetComponentInChildren<TextMeshProUGUI>().text = LM.GLV(Constants.RESET);
+        closeButton.GetComponentInChildren<TextMeshProUGUI>().text = LM.GLV(Constants.CLOSE);
+        UpdateToggleLabel(fullscreenToggle.isOn);
 
         fullscreenToggle.onValueChanged.AddListener(SetDisplayMode);
         resolutionDropdown.onValueChanged.AddListener(SetResolution);
         closeButton.onClick.AddListener(CloseSetting);
         defaultButton.onClick.AddListener(ResetSetting);
-
-        settingPanel.SetActive(false);
     }
 
     private void InitializeResolution()
@@ -69,7 +71,7 @@ public class SettingManager : SingletonMonoBase<SettingManager>
     private void SetDisplayMode(bool isFullscreen)
     {
         Screen.fullScreenMode = isFullscreen ? FullScreenMode.FullScreenWindow : FullScreenMode.Windowed;
-        UPdateToggleLabel(isFullscreen);
+        UpdateToggleLabel(isFullscreen);
     }
 
     private void SetResolution(int index)
@@ -82,8 +84,12 @@ public class SettingManager : SingletonMonoBase<SettingManager>
 
     private void CloseSetting()
     {
-        SaveSettings();
-        settingPanel.SetActive(false);
+        string sceneName = GameManager.Instance.currentScene;
+        if (sceneName == Constants.GAME_SCENE)
+        {
+            GameManager.Instance.historyRecords.RemoveLast();
+        }
+        SceneManager.LoadScene(sceneName);
     }
     
     private void SaveSettings()
@@ -101,9 +107,7 @@ public class SettingManager : SingletonMonoBase<SettingManager>
         fullscreenToggle.isOn = true;
     }
 
-    private void UPdateToggleLabel(bool isFullscreen) =>
+    private void UpdateToggleLabel(bool isFullscreen) =>
         toggleLabel.text = isFullscreen ? Constants.FULLSCREEN : Constants.WINDIW ;
     
-
-    public void ShowSettingPanel() => settingPanel.SetActive(true);
 }

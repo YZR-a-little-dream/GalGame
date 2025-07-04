@@ -1,4 +1,5 @@
 {
+    "zh":"中文",
     "start_game": "开始游戏",
     "continue_game": "继续游戏",
     "settings": "设置",
@@ -10,5 +11,9 @@
     "empty_slot": "无存档内容",
     "previous_page": "上一页",
     "next_page": "下一页",
-    "back": "返回"
+    "back": "返回",
+    "close":"关闭",
+    "Please Enter Your Name":"请输入您的名字：",
+    "confirm":"确认",
+    "reset":"恢复默认设置"
 }

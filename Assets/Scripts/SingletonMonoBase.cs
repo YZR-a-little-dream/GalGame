@@ -20,3 +20,4 @@ public class SingletonMonoBase<T> : MonoBehaviour where T:MonoBehaviour
 }
 
 
+

@@ -7,11 +7,20 @@ using UnityEngine;
 
 public class LocalizationManager : SingletonMonoBase<LocalizationManager>
 {
+    /// <summary>
+    /// string: 语言 string: 对应语言的文件
+    /// </summary>
     public Dictionary<string, string> localizedText;
     public string currentLanguage = Constants.DEFAULT_LANGUAGE;
 
     public Action LanguageChanged;
 
+    protected override void Awake()
+    {
+        base.Awake();
+        DontDestroyOnLoad(gameObject);
+    }
+    
     private void Start()
     {
         LoadLanguage(currentLanguage);
@@ -47,5 +56,17 @@ public class LocalizationManager : SingletonMonoBase<LocalizationManager>
             return localizedText[key];
         }
         return key;
+    }
+
+    
+}
+
+
+//  @2  29集7:00  静态函数封装单例？？？
+public static class LM
+{
+    public static string GLV(string curlanguageIndex)
+    {
+        return LocalizationManager.Instance.GetLocalizedValue(curlanguageIndex);
     }
 }

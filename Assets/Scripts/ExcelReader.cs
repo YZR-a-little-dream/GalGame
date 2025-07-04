@@ -20,13 +20,6 @@ public class ExcelReader : MonoBehaviour
         public string characterAction;          //角色位置
         public string characterImgFileName;     //角色立绘
 
-        public string lastBgImg;
-        public string lastBgMusic;
-        public string englishName;
-        public string englishContent;
-        public string japaneseName;
-        public string japaneseContent;
-
     }
 
     public static List<ExcelData> ReadExcel(string filepath)
@@ -34,34 +27,46 @@ public class ExcelReader : MonoBehaviour
         List<ExcelData> excelData = new List<ExcelData>();
         //兼容性考虑
         Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-        using(FileStream stream = File.Open(filepath, FileMode.Open, FileAccess.Read))
+        using (FileStream stream = File.Open(filepath, FileMode.Open, FileAccess.Read))
         {
-            using(var reader = ExcelReaderFactory.CreateReader(stream))
+            using (var reader = ExcelReaderFactory.CreateReader(stream))
             {
                 do
                 {
                     while (reader.Read())
                     {
-                        int num = 0;
                         ExcelData data = new ExcelData();
-                        data.speakerName = reader.IsDBNull(0) ? string.Empty : reader.GetValue(0)?.ToString();
-                        data.speakingContent = reader.IsDBNull(1) ? string.Empty : reader.GetValue(1)?.ToString();
-                        data.avatorImageFileName = reader.IsDBNull(2) ? string.Empty : reader.GetValue(2)?.ToString();
-                        data.vocalAudioFileName = reader.IsDBNull(3) ? string.Empty : reader.GetValue(3)?.ToString();
-                        data.bgImageFileName = reader.IsDBNull(4) ? string.Empty : reader.GetValue(4)?.ToString();
-                        data.bgMusicFileName = reader.IsDBNull(5) ? string.Empty : reader.GetValue(5)?.ToString();
-                        data.characterNum = reader.IsDBNull(6) ?
-                        0 :
-                        int.TryParse(reader.GetValue(6)?.ToString(), out num) ? num : Constants.DEFAULT_UNEXiST_NUMBER;
-                        data.characterAction = reader.IsDBNull(7) ? string.Empty : reader.GetValue(7)?.ToString();
-                        data.characterImgFileName = reader.IsDBNull(8) ? string.Empty : reader.GetValue(8)?.ToString();
-                        data.lastBgImg = reader.IsDBNull(9) ? string.Empty : reader.GetValue(9)?.ToString();
-                        data.lastBgMusic = reader.IsDBNull(10) ? string.Empty : reader.GetValue(10)?.ToString();
-                        excelData.Add(data);            
+                        data.speakerName = GetCellString(reader, 0);
+                        data.speakingContent = GetCellString(reader, 1);
+                        data.avatorImageFileName = GetCellString(reader, 2);
+                        data.vocalAudioFileName = GetCellString(reader, 3);
+                        data.bgImageFileName = GetCellString(reader, 4);
+                        data.bgMusicFileName = GetCellString(reader, 5);
+                        // data.characterNum = reader.IsDBNull(6) ?
+                        // 0 :
+                        // int.TryParse(reader.GetValue(6)?.ToString(), out num) ? num : Constants.DEFAULT_UNEXiST_NUMBER;
+                        data.characterNum = GetCellInt(reader, 6);
+                        data.characterAction = GetCellString(reader, 7);
+                        data.characterImgFileName = GetCellString(reader, 8);
+
+                        excelData.Add(data);
                     }
-                }while(reader.NextResult());
+                } while (reader.NextResult());
             }
         }
         return excelData;
     }
+
+    private static string GetCellString(IExcelDataReader reader, int index)
+    {
+        return reader.IsDBNull(index) ? string.Empty : reader.GetValue(index)?.ToString();
+    }
+
+    private static int GetCellInt(IExcelDataReader reader, int index)
+    {
+        int num = 0;
+        return reader.IsDBNull(index) ? Constants.DEFAULT_UNEXiST_NUMBER :
+        int.TryParse(reader.GetValue(index)?.ToString(), out num) ? num : Constants.DEFAULT_UNEXiST_NUMBER;
+    }
 }
+

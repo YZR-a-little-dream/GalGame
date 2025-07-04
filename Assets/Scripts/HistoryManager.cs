@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class HistoryManager : SingletonMonoBase<HistoryManager>
@@ -14,9 +15,13 @@ public class HistoryManager : SingletonMonoBase<HistoryManager>
 
     private LinkedList<string> historyRecords;      // 保存的历史记录
 
-    private void Start() {
-        historyScrollView.SetActive(false);
-        closeButton.onClick.AddListener(CloseHistory);
+    private void Start()
+    {
+        closeButton.GetComponentInChildren<TextMeshProUGUI>().text = LM.GLV(Constants.CLOSE);
+        // historyScrollView.SetActive(false);
+        // closeButton.onClick.AddListener(CloseHistory);
+        closeButton.onClick.AddListener(CloseHistory);      //绑定关闭按钮事件
+        ShowHistory(GameManager.Instance.historyRecords);
     }
 
     public void ShowHistory(LinkedList<string> records)
@@ -35,6 +40,7 @@ public class HistoryManager : SingletonMonoBase<HistoryManager>
         //显示新的历史记录
         while (currentNode != null)
         {
+            //FIXME: 本地化可能存在问题 p30   03:59
             AddHistoryItem(currentNode.Value);
             currentNode = currentNode.Previous;
         }
@@ -50,5 +56,10 @@ public class HistoryManager : SingletonMonoBase<HistoryManager>
         historyItem.transform.SetAsFirstSibling();          // 将新创建的历史记录显示在最上方
     }
 
-    private void CloseHistory() =>historyScrollView.SetActive(false);
+    private void CloseHistory()
+    {                                                           
+        //当返回该场景时会添加两条历史记录
+        GameManager.Instance.historyRecords.RemoveLast();           //移除最后一条历史记录 
+        SceneManager.LoadScene(GameManager.Instance.currentScene);                                                        
+    }
 }

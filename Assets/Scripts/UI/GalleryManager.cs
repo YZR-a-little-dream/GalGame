@@ -1,15 +1,17 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Net.NetworkInformation;
 using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-public class GalleryManager : SingletonMonoBase<GalleryManager>,IPointerClickHandler
+public class GalleryManager : SingletonMonoBase<GalleryManager>
 {
-    public GameObject galleryPanel;
+    //public GameObject galleryPanel;
     public TextMeshProUGUI panelTitle;
     public Button[] galleryButtons;
     public Button prevPageButton;
@@ -24,32 +26,38 @@ public class GalleryManager : SingletonMonoBase<GalleryManager>,IPointerClickHan
     private readonly int slotsPerPage = Constants.GALLERY_SLOTS_PER_PAGE;
     private readonly int totalSlots = Constants.ALL_BACKGROUNDS.Length;
 
-    protected void Start() {
+    protected void Start()
+    {
+        panelTitle.text = LM.GLV(Constants.GALLERY);
+
+        prevPageButton.GetComponentInChildren<TextMeshProUGUI>().text = LM.GLV(Constants.PREV_PAGE);
+        nextPageButton.GetComponentInChildren<TextMeshProUGUI>().text = LM.GLV(Constants.NEXT_PAGE);
+        backButton.GetComponentInChildren<TextMeshProUGUI>().text = LM.GLV(Constants.BACK);
+
         prevPageButton.onClick.AddListener(OnPrevPageButtonClick);
         nextPageButton.onClick.AddListener(OnNextPageButtonClick);
         backButton.onClick.AddListener(OnBackButtonClick);
 
-        galleryPanel.SetActive(false);
-        panelTitle.text = Constants.GALLERY;
-
         bigImagePanel.SetActive(false);
 
         Button bigImageButton = bigImagePanel.GetComponent<Button>();
-        if(bigImageButton != null)
+        if (bigImageButton != null)
         {
             bigImageButton.onClick.AddListener(HideImage);
-        }else{
-            Debug.Log("BigImagePanel上没有Button？");
         }
-    }
+        else
+        {
+            Debug.Log("BigImagePanel上没有Button?");
+        }
 
-    
-
-    public void ShowGalleryPanel()
-    {
         UpdateUI();
-        galleryPanel.SetActive(true);
     }
+
+    // public void ShowGalleryPanel()
+    // {
+    //     UpdateUI();
+    //     galleryPanel.SetActive(true);
+    // }
 
     private void UpdateUI()
     {
@@ -69,7 +77,7 @@ public class GalleryManager : SingletonMonoBase<GalleryManager>,IPointerClickHan
     {
         button.gameObject.SetActive(true);
         string bgName = Constants.ALL_BACKGROUNDS[slotIndex];
-        bool isUnlocked = VNManager.Instance.unlockedBGHashSets.Contains(bgName);
+        bool isUnlocked = GameManager.Instance.unlockedBGHashSets.Contains(bgName);
 
         string imagePath = Constants.THUMBNATL_PATH + (isUnlocked ? bgName :Constants.GALLERY_PACEHOLDER);
         Sprite sprite = Resources.Load<Sprite>(imagePath);
@@ -87,7 +95,7 @@ public class GalleryManager : SingletonMonoBase<GalleryManager>,IPointerClickHan
     private void onButtonClick(Button button, int slotIndex)
     {
         string bgName = Constants.ALL_BACKGROUNDS[slotIndex];
-        bool isUnlocked = VNManager.Instance.unlockedBGHashSets.Contains(bgName); 
+        bool isUnlocked = GameManager.Instance.unlockedBGHashSets.Contains(bgName); 
 
         if(!isUnlocked)
             return;
@@ -111,7 +119,7 @@ public class GalleryManager : SingletonMonoBase<GalleryManager>,IPointerClickHan
 
     private void OnBackButtonClick()
     {
-        galleryPanel.SetActive(false);
+        SceneManager.LoadScene(Constants.MENU_SCENE);
     }
 
     private void OnNextPageButtonClick()
@@ -137,9 +145,5 @@ public class GalleryManager : SingletonMonoBase<GalleryManager>,IPointerClickHan
         UpdateUI();
     }
 
-    public void OnPointerClick(PointerEventData eventData)
-    {
-        if(eventData.button == PointerEventData.InputButton.Right)
-            galleryPanel.SetActive(false);
-    }
+    
 }

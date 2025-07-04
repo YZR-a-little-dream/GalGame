@@ -1,4 +1,5 @@
 {
+    "ja":"日本語",
     "start_game": "ゲーム開始",
     "continue_game": "続きから",
     "settings": "設定",
@@ -10,5 +11,9 @@
     "empty_slot": "空きスロット",
     "previous_page": "前へ",
     "next_page": "次へ",
-    "back": "戻る"
+    "back": "戻る",
+    "close":"关闭",
+    "Please Enter Your Name":"お名前を入力願います：",
+    "confirm":"確認します",
+    "reset":"元の設定に戻します"
 }

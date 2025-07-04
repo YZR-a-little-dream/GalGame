@@ -1,4 +1,5 @@
 {
+    "en":"English",
     "start_game": "Start game",
     "continue_game": "Continue_game",
     "settings": "Settings",
@@ -10,5 +11,9 @@
     "empty_slot": "Empty Slot",
     "previous_page": "Previous\nPage",
     "next_page": "Next\npage",
-    "back": "Back"
+    "back": "Back",
+    "close":"close",
+    "Please Enter Your Name":"Please Enter Your Name",
+    "confirm":"Confirm",
+    "reset": "Restore the default Settings"
 }

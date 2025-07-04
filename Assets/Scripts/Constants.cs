@@ -6,12 +6,12 @@ public class Constants : MonoBehaviour
 {
     public static float DEFAULT_TYPING_SPEED = 0.05f;
     public static float DEFAULT_SKIP_MODE_TYPING_SPEED = 0.01f;
-    public static int DEFAULT_START_LINE = 1;
+    public static int DEFAULT_STORY_START_LINE = 1;
     public static int DEFAULT_UNEXiST_NUMBER = -1;
 
-    //public static string STORY_PATH = "Assets/Resources/story/";
+    public static string STORY_PATH = "story";
     public static string DEFAULT_STORY_FILE_NAME = "1";
-    public static string DEFAULT_FILE_EXTENSION = ".xlsx";
+    public static string STORY_FILE_EXTENSION = ".xlsx";
 
     public static string BACKGROUND_PATH = "image/background/";
     public static string AVATAR_PATH = "image/avatar/";
@@ -52,8 +52,8 @@ public class Constants : MonoBehaviour
     public static int SLOTS_PER_PAGE = 8;                         //每页显示8个栏位
     public static int TOTAL_SLOTS = 40;                           //总共40个栏位
     public static string COLON = ": ";
-    public static string SAVE_GAME = "Save_game";
-    public static string LOAD_GAME = "Load_game";
+    public static string SAVE_GAME = "save_game";
+    public static string LOAD_GAME = "load_game";
     public static string Empty_SLOT = "Empty_slot";
 
     public static string CAMERA_NOT_FOUND = "Main camera  notfound.";
@@ -74,10 +74,10 @@ public class Constants : MonoBehaviour
     {
         "1","2","3","4","c_青空","c_青空2","c_青空3","c_月01","c_月03","c_月04","c_月05"
     };
-    public static string GALLERY = "Gallery";
+    public static string GALLERY = "gallery";
     public static string GALLERY_PACEHOLDER = "gallery_placeholder";
 
-    public static string CONFIRM = "确认名字";
+
     public static string PROMPT_TEXT = "Please Enter Your Name";
     //public static string DEAFULT_PLAYERNAME = "Player";
 
@@ -91,7 +91,7 @@ public class Constants : MonoBehaviour
     public static string LANGUAGE_PATH = "languages";
     public static string JSON_FILE_EXTENSION = ".json";
     public static string LOCALIZATION_LOAD_FAILED = "Failed to load localization file:";
-    public static int DEFAULE_LANGUAGE_INDEX = 0;
+    public static int DEFAULT_LANGUAGE_INDEX = 0;
 
     public static string CHINESE = "中文";
     public static string ENGLISH = "English";
@@ -101,6 +101,31 @@ public class Constants : MonoBehaviour
     #region  IntroManger
     public static string videoPath = "video";
     public static string VIDEO_FILE_EXTENSION = ".mp4";
+
+    #endregion
+
+    #region  Scenes
+
     public static string MENU_SCENE = "MenuScene";
+
+    public static string GAME_SCENE = "GameScene";
+
+    public static string INPUT_SCENE = "InputScene";
+
+    public static string SAVE_LOAD_SCENE = "SaveLoadScene";
+
+    public static string Gallery_SCENE = "GalleryScene";
+    public static string Setting_SCENE = "SettingScene";
+    public static string HISTORY_SCENE = "HistoryScene";
+
+    #endregion
+
+    #region  本地化
+    public static string PREV_PAGE = "previous_page";
+    public static string NEXT_PAGE = "next_page";
+    public static string BACK = "back";
+    public static string CLOSE = "close";
+    public static string CONFIRM = "confirm";
+    public static string RESET = "reset";
     #endregion
 }
