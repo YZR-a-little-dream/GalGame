@@ -15,5 +15,12 @@
     "close":"关闭",
     "Please Enter Your Name":"请输入您的名字：",
     "confirm":"确认",
-    "reset":"恢复默认设置"
+    "reset":"恢复默认设置",
+    "display_mode":"显示模式",
+    "resolution":"分辨率",
+    "window":"窗口",
+    "fullscreen":"全屏",
+    "volume":"音量大小",
+    "bgm":"背景音大小",
+    "voice":"人声大小"
 }

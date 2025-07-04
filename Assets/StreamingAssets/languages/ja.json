@@ -15,5 +15,12 @@
     "close":"关闭",
     "Please Enter Your Name":"お名前を入力願います：",
     "confirm":"確認します",
-    "reset":"元の設定に戻します"
+    "display_mode":"表示モードです",
+    "resolution":"解像度です",
+    "window":"ウィンドウです",
+    "fullscreen":"全画面です",
+    "reset":"元の設定に戻します",
+    "volume":"ボリュームです",
+    "bgm":"背景音です",
+    "voice":"人声の大きさ"
 }

@@ -21,6 +21,10 @@ public class Constants : MonoBehaviour
     public static string VOCAL_PATH = "audio/vocal/";
     public static string MUSIC_PATH = "audio/music/";
 
+    public static string VOCAL_LOAD_FAILED = "Failed to load music";
+    public static string MENU_MUSIC_FILE_NAME = "1";
+    public static string CREDITS_MUSIC_FILE_NAME = "4";
+
 
     public static string AUDIO_LOAD_FAILED = "Failed to load audio file: ";
     public static string MUSIC_LOAD_FAILED = "Failed to load music file: ";
@@ -117,6 +121,7 @@ public class Constants : MonoBehaviour
     public static string Gallery_SCENE = "GalleryScene";
     public static string Setting_SCENE = "SettingScene";
     public static string HISTORY_SCENE = "HistoryScene";
+    public static string CREDITS_SCENE = "CreditsScene";
 
     #endregion
 
@@ -128,4 +133,18 @@ public class Constants : MonoBehaviour
     public static string CONFIRM = "confirm";
     public static string RESET = "reset";
     #endregion
+
+    public static string MASTER_VOLUME = "MasterVolume";
+    public static string MUSIC_VOLUME = "MusicVolume";
+    public static string VOICE_VOLUME = "VoiceVolume";
+
+    public static float DEFAULT_VOLUME = 0.8f;
+
+    public static string CREDITS_PATH = "credits";
+    public static string CREDITS_FILE_EXTENSION = ".txt";
+    public static string CREDITS_SCROLL_END = "Credits scrolling ended";
+    public static float CREDITS_SCROLL_END_Y = 2000f;
+    public static string CREDITS_LOAD_FILED = "failed to load credits file:";
+    public static float DEFAULT_MULTIPLIER = 1f;
+    public static float DEFAULT_FAST_MULTIPLIER = 3f;
 }

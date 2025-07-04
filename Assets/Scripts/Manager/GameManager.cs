@@ -10,7 +10,8 @@ public class GameManager : SingletonMonoBase<GameManager>
     public string currentScene;
     public string currentStoryFile;
     public int currentLineIndex;
-    public int currentLanguageIndex;
+    public int currentLanguageIndex = Constants.DEFAULT_LANGUAGE_INDEX;
+    public string currentLanguage = Constants.DEFAULT_LANGUAGE;
     public string currentBGImg;
     public string currentBGMusic;
 

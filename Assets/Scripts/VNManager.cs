@@ -26,10 +26,10 @@ public class VNManager : SingletonMonoBase<VNManager>
     public ScreenShotter screenShotter;      //截图工具
 
     public Image avatorImage;               //头像图片
-    public AudioSource vocalAudio;          //人声
+    //public AudioSource vocalAudio;          //人声
 
     public Image backgroundImage;           //背景图片
-    public AudioSource backgroundMusic;     //背景音乐
+    //public AudioSource backgroundMusic;     //背景音乐
 
     public Image[] characterImageArr;            //角色立绘列表  //TODO:@1 角色立绘修改
       
@@ -175,10 +175,10 @@ public class VNManager : SingletonMonoBase<VNManager>
         currentLine = lineIndex;
 
         backgroundImage.gameObject.SetActive(false);
-        backgroundMusic.gameObject.SetActive(false);
+        //backgroundMusic.gameObject.SetActive(false);
 
         avatorImage.gameObject.SetActive(false);
-        vocalAudio.gameObject.SetActive(false);
+        //vocalAudio.gameObject.SetActive(false);
 
         foreach (var img in characterImageArr)
         {
@@ -252,7 +252,8 @@ public class VNManager : SingletonMonoBase<VNManager>
             if (storyData[currentLine].speakerName == Constants.END_OF_STORY)
             {
                 GameManager.Instance.hasStarted = false;
-                SceneManager.LoadScene(Constants.MENU_SCENE);
+                SceneManager.LoadScene(Constants.CREDITS_SCENE);
+                Debug.Log("1111");
             }
 
             if (storyData[currentLine].speakerName == Constants.CHOICE)
@@ -531,38 +532,40 @@ public class VNManager : SingletonMonoBase<VNManager>
     #region  Music and Audio
     private void PlayerVocalAudio(string audioFileName)
     {
-        string audioPath = Constants.VOCAL_PATH + audioFileName;
-        PlayAudio(audioPath,vocalAudio,false);
+        // string audioPath = Constants.VOCAL_PATH + audioFileName;
+        // PlayAudio(audioPath,vocalAudio,false);;
+        AudioManager.Instance.PlayVoice(audioFileName);
     }
 
     private void PlayBackgroundMusic(string bgMusicFileName)
     {
-        string bgMusicPath = Constants.MUSIC_PATH + bgMusicFileName;
-        PlayAudio(bgMusicPath,backgroundMusic,true);
+        // string bgMusicPath = Constants.MUSIC_PATH + bgMusicFileName;
+        // PlayAudio(bgMusicPath,backgroundMusic,true);
+        AudioManager.Instance.PlayBackground(bgMusicFileName);
     }
 
-    private void PlayAudio(string bgMusicPath, AudioSource audioSource, bool isLoop)
-    {
-        AudioClip audioClip = Resources.Load<AudioClip>(bgMusicPath);
-        if (audioClip != null)
-        {
-            audioSource.clip = audioClip;
-            audioSource.gameObject.SetActive(true);
-            audioSource.Play();
-            audioSource.loop = isLoop;
-        }
-        else
-        {
-            if(audioSource == backgroundMusic)
-            {
-                Debug.LogError(Constants.MUSIC_LOAD_FAILED + bgMusicPath);
-            }
-            else if (audioSource == vocalAudio)
-            {
-                Debug.LogError(Constants.AUDIO_LOAD_FAILED + bgMusicPath);
-            }
-        }
-    }
+    // private void PlayAudio(string bgMusicPath, AudioSource audioSource, bool isLoop)
+    // {
+    //     AudioClip audioClip = Resources.Load<AudioClip>(bgMusicPath);
+    //     if (audioClip != null)
+    //     {
+    //         audioSource.clip = audioClip;
+    //         audioSource.gameObject.SetActive(true);
+    //         audioSource.Play();
+    //         audioSource.loop = isLoop;
+    //     }
+    //     else
+    //     {
+    //         if(audioSource == backgroundMusic)
+    //         {
+    //             Debug.LogError(Constants.MUSIC_LOAD_FAILED + bgMusicPath);
+    //         }
+    //         else if (audioSource == vocalAudio)
+    //         {
+    //             Debug.LogError(Constants.AUDIO_LOAD_FAILED + bgMusicPath);
+    //         }
+    //     }
+    // }
 
     #endregion
 

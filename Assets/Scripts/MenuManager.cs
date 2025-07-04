@@ -176,7 +176,10 @@ public class MenuManager : SingletonMonoBase<MenuManager>
     {
         currentLanguageIndex = (currentLanguageIndex + 1) % Constants.LANGUAGES.Length;
         LocalizationManager.Instance.LoadLanguage(Constants.LANGUAGES[currentLanguageIndex]);
+
         GameManager.Instance.currentLanguageIndex = currentLanguageIndex;
+        GameManager.Instance.currentLanguage = Constants.LANGUAGES[currentLanguageIndex];
+        
         updateLanguageBtnText();
     }
 

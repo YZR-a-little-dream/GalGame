@@ -15,5 +15,12 @@
     "close":"close",
     "Please Enter Your Name":"Please Enter Your Name",
     "confirm":"Confirm",
-    "reset": "Restore the default Settings"
+    "reset": "Restore the default Settings",
+    "display_mode":"displayMode",
+    "resolution":"resolution",
+    "window":"window",
+    "fullscreen":"fullscreen",
+    "volume":"volume",
+    "bgm":"bgm",
+    "voice":"voice"
 }
