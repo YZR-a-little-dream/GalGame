@@ -35,7 +35,14 @@ public class MenuManager : SingletonMonoBase<MenuManager>
     {
         //记录当前场景
         GameManager.Instance.currentScene = Constants.MENU_SCENE;
-        continueButton.interactable = false;
+        if (GameManager.Instance.hasStarted)
+        {
+            continueButton.interactable = true;
+        }
+        else
+        {
+            continueButton.interactable = false;
+        }
         menuButtonsAddListener();
 
         currentLanguageIndex = GameManager.Instance.currentLanguageIndex;

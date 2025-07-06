@@ -6,30 +6,39 @@ using UnityEngine;
 using UnityEngine.Audio;
 using UnityEngine.SceneManagement;
 
-public class AudioManager : SingletonMonoBase<AudioManager>
+
+public class AudioManager : MonoBehaviour
 {
     public AudioMixer audioMixer;
     public AudioMixerGroup musicGroup;
     public AudioMixerGroup voiceGroup;
 
-    [SerializeField] private AudioSource musicSource;
-    [SerializeField] private AudioSource voiceSource;
-
-    protected override void Awake()
+    private AudioSource musicSource;
+    private AudioSource voiceSource;
+    public static AudioManager Instance { get; private set; }
+    private void Awake()
     {
-        base.Awake();
-        DontDestroyOnLoad(gameObject);
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
 
-        musicSource = gameObject.AddComponent<AudioSource>();
-        musicSource.outputAudioMixerGroup = musicGroup;
-        musicSource.loop = true;
+            musicSource = gameObject.AddComponent<AudioSource>();
+            musicSource.outputAudioMixerGroup = musicGroup;
+            musicSource.loop = true;
 
-        voiceSource = gameObject.AddComponent<AudioSource>();
-        voiceSource.outputAudioMixerGroup = voiceGroup;
-        voiceSource.loop = false;
+            voiceSource = gameObject.AddComponent<AudioSource>();
+            voiceSource.outputAudioMixerGroup = voiceGroup;
+            voiceSource.loop = false;
 
-        LoadVolumeSettings();
-        SceneManager.sceneLoaded += OnSceneLoaded;
+            LoadVolumeSettings();
+            SceneManager.sceneLoaded += OnSceneLoaded;
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+
     }
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)

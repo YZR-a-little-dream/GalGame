@@ -253,7 +253,6 @@ public class VNManager : SingletonMonoBase<VNManager>
             {
                 GameManager.Instance.hasStarted = false;
                 SceneManager.LoadScene(Constants.CREDITS_SCENE);
-                Debug.Log("1111");
             }
 
             if (storyData[currentLine].speakerName == Constants.CHOICE)
