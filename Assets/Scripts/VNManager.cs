@@ -11,6 +11,8 @@ using Newtonsoft.Json;
 using UnityEngine.SceneManagement;
 using Unity.Burst.CompilerServices;
 using Unity.VisualScripting;
+using System.Linq;
+using UnityEngine.Rendering.Universal;
 
 public class VNManager : SingletonMonoBase<VNManager>
 {
@@ -32,11 +34,6 @@ public class VNManager : SingletonMonoBase<VNManager>
     //public AudioSource backgroundMusic;     //背景音乐
 
     public Image[] characterImageArr;            //角色立绘列表  //TODO:@1 角色立绘修改
-      
-    //分支面板
-    public GameObject choicePanel;
-    public Button choiceButton1;
-    public Button choiceButton2;
 
     //右下角的控制按钮
     public GameObject bottomButtonsPanel;
@@ -51,7 +48,7 @@ public class VNManager : SingletonMonoBase<VNManager>
     private string currentSpeakingContent;  //保存当前对话内容
 
     private List<ExcelReader.ExcelData> storyData;
-    private int currentLine;
+    [SerializeField]private int currentLine;
     private string currentStoryFileName;
     private float currentTypingSpeed = Constants.DEFAULT_TYPING_SPEED;
 
@@ -88,9 +85,13 @@ public class VNManager : SingletonMonoBase<VNManager>
     void Start()
     {
         GameManager.Instance.currentScene = Constants.GAME_SCENE;
+        currentLine = GameManager.Instance.currentLineIndex;
         InitializeSaveFilePath();
         bottomButtonsAddListener();
-        InitializeAndLoadStory(GameManager.Instance.currentStoryFile, GameManager.Instance.currentLineIndex);
+        InitializeImage();
+        LoadStory(GameManager.Instance.currentStoryFile);
+        DisplayNextLine();
+        //InitializeAndLoadStory(GameManager.Instance.currentStoryFile, GameManager.Instance.currentLineIndex);
     }
 
     void Update()
@@ -102,7 +103,7 @@ public class VNManager : SingletonMonoBase<VNManager>
             {
                 OpenGameUI();
             }                
-            else if(!IsHittingBottomButtons())
+            else if(!IsHittingBottomButtons() && !ChoiceManager.Instance.choicePanel.activeSelf)
             {
                 DisplayNextLine();
             }
@@ -156,24 +157,28 @@ public class VNManager : SingletonMonoBase<VNManager>
 
     }
 
-    private void InitializeAndLoadStory(string fileName,int lineIndex)
+    private void LoadStory(string fileName)
     {
-        Initialize(lineIndex);
         loadStoryFromFile(fileName);
-        // if(isLoad)
-        // {
-        //     RecoverLastBgAndCharcter();
-        //     DisplayNextLine();          //FIXME：自己修改部分可能会出现问题，完成读取文本内容
-        //     isLoad = false;
-        // }
         RecoverLastBGAndCharacter();
-        DisplayNextLine();
     }
 
-    private void Initialize(int lineIndex)
-    {
-        currentLine = lineIndex;
+    // private void InitializeAndLoadStory(string fileName, int lineIndex)
+    // {
+    //     Initialize(lineIndex);
+    //     loadStoryFromFile(fileName);
+    //     // if(isLoad)
+    //     // {
+    //     //     RecoverLastBgAndCharcter();
+    //     //     DisplayNextLine();          //FIXME：自己修改部分可能会出现问题，完成读取文本内容
+    //     //     isLoad = false;
+    //     // }
+    //     RecoverLastBGAndCharacter();
+    //     DisplayNextLine();
+    // }
 
+    private void InitializeImage()
+    {
         backgroundImage.gameObject.SetActive(false);
         //backgroundMusic.gameObject.SetActive(false);
 
@@ -185,7 +190,7 @@ public class VNManager : SingletonMonoBase<VNManager>
             img.gameObject.SetActive(false);
         }
 
-        choicePanel.SetActive(false);
+        //choicePanel.SetActive(false);
         //historyRecords = new LinkedList<historyData>();
     }
     
@@ -239,6 +244,7 @@ public class VNManager : SingletonMonoBase<VNManager>
             maxReachedLineIndex = currentLine;
             GameManager.Instance.MaxReachedLineIndicesDict[currentStoryFileName] = maxReachedLineIndex;
         }
+
         //到达表格最后一行
         if (currentLine >= storyData.Count - 1)
         {
@@ -257,12 +263,14 @@ public class VNManager : SingletonMonoBase<VNManager>
 
             if (storyData[currentLine].speakerName == Constants.CHOICE)
             {
-                showChociePanel();
+                showChocies();
             }
 
             if (storyData[currentLine].speakerName == Constants.GOTO)
             {
-                InitializeAndLoadStory(storyData[currentLine].speakingContent, Constants.DEFAULT_STORY_START_LINE);
+                LoadStory(storyData[currentLine].speakingContent);
+                currentLine = Constants.DEFAULT_STORY_START_LINE;
+                DisplayNextLine();
             }
             return;
         }
@@ -378,10 +386,7 @@ public class VNManager : SingletonMonoBase<VNManager>
                 }
             }
         }
-            
-        // }
-
-        
+          
     }
 
     private void RecordHistory(string speaker, string currentSpeakingContent)
@@ -398,24 +403,34 @@ public class VNManager : SingletonMonoBase<VNManager>
     #endregion
 
     #region  show choice panel
-    private void showChociePanel()
+    private void showChocies()
     {
         var data = storyData[currentLine];
-        choiceButton1.onClick.RemoveAllListeners();
-        choiceButton2.onClick.RemoveAllListeners();
-        choicePanel.SetActive(true);
-        choiceButton1.GetComponentInChildren<TextMeshProUGUI>().text = data.speakingContent;
-        choiceButton1.onClick.AddListener(() => InitializeAndLoadStory(data.avatorImageFileName,Constants.DEFAULT_STORY_START_LINE));
-        choiceButton2.GetComponentInChildren<TextMeshProUGUI>().text = data.vocalAudioFileName;
-        choiceButton2.onClick.AddListener(() => InitializeAndLoadStory(data.bgImageFileName,Constants.DEFAULT_STORY_START_LINE));
+        var choice = data.speakingContent
+                        .Split(Constants.SHOICEDELIMITER)
+                        .Select(s => s.Trim())
+                        .ToList();
+        var actions = data.avatorImageFileName
+                        .Split(Constants.SHOICEDELIMITER)
+                        .Select(s => s.Trim())
+                        .ToList();
+        ChoiceManager.Instance.showChoices(choice, actions,handleChoice);
     }
+
+    private void handleChoice(string selectedChoice)
+    {
+        currentLine = Constants.DEFAULT_STORY_START_LINE;
+        LoadStory(selectedChoice);
+        DisplayNextLine();
+    }
+
     #endregion
 
     #region  Images and Character Animations
     private void UpdateAvatarImage(string imageFileName)
     {
         string avatarImagepath = Constants.AVATAR_PATH + imageFileName;
-        UpdateImage(avatarImagepath,avatorImage);
+        UpdateImage(avatarImagepath, avatorImage);
     }
 
     private void UpdateBackgroundImage(string bgImageFileName)

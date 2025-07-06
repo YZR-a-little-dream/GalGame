@@ -51,6 +51,7 @@
     <Compile Include="Assets\Scripts\Localized\LocalizedText.cs" />
     <Compile Include="Assets\Scripts\SingletonMonoBase.cs" />
     <Compile Include="Assets\Scripts\ScreenShotter.cs" />
+    <Compile Include="Assets\Scripts\ChoiceManager.cs" />
     <Compile Include="Assets\Scripts\AudioManager.cs" />
     <Compile Include="Assets\Scripts\Manager\GameManager.cs" />
     <Compile Include="Assets\Scripts\UI\GalleryManager.cs" />

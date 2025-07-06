@@ -983,9 +983,6 @@ MonoBehaviour:
   characterImageArr:
   - {fileID: 2100226048}
   - {fileID: 1929053311}
-  choicePanel: {fileID: 1876952761}
-  choiceButton1: {fileID: 0}
-  choiceButton2: {fileID: 0}
   bottomButtonsPanel: {fileID: 745899245}
   autoButton: {fileID: 1183218244}
   skipButton: {fileID: 1506630911}
@@ -1011,6 +1008,7 @@ Transform:
   m_Children:
   - {fileID: 1387242480}
   - {fileID: 2027608824}
+  - {fileID: 1533539132}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &745899245
@@ -2213,6 +2211,53 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1506630909}
   m_CullTransparentMesh: 1
+--- !u!1 &1533539131
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1533539132}
+  - component: {fileID: 1533539133}
+  m_Layer: 0
+  m_Name: Choice
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1533539132
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1533539131}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 645197600}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1533539133
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1533539131}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 88d8dd6e011225d428b25c3f810b164b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  choicePanel: {fileID: 1876952761}
+  choiceButtonPrefab: {fileID: 5355384709287731250, guid: 6d31b0f8183627c47baa816da6defc42, type: 3}
+  choiceButtonContainer: {fileID: 264471311}
 --- !u!1 &1598229395
 GameObject:
   m_ObjectHideFlags: 0

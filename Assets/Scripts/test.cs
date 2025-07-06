@@ -6,12 +6,12 @@ using UnityEngine;
 
 public class test : MonoBehaviour
 {
+    public Transform choiceButtonContainer;
     private void Start()
     {
-        Image[] images = GetComponentsInChildren<Image>(true);
-        foreach (var img in images)
+        foreach (Transform child in choiceButtonContainer)
         {
-            Debug.Log(img);
+
         }
-     }  
+    }  
 }

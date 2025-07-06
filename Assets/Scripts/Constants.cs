@@ -33,7 +33,7 @@ public class Constants : MonoBehaviour
 
     public static string NO_DATA_FOUND = "NO data found";
     public static string END_OF_STORY = "End of story";
-    public static string CHOICE = "choice";
+    public static string CHOICE = "Choice";
 
     public static string CHARACTERACTION_APPEARAT = "appearAt";
     public static string CHARACTERACTION_DISAPPEAR = "disappear";
@@ -147,4 +147,6 @@ public class Constants : MonoBehaviour
     public static string CREDITS_LOAD_FILED = "failed to load credits file:";
     public static float DEFAULT_MULTIPLIER = 1f;
     public static float DEFAULT_FAST_MULTIPLIER = 3f;
+
+    public static char SHOICEDELIMITER = '\n';
 }
