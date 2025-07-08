@@ -88,6 +88,7 @@ public class Constants : MonoBehaviour
     public static string NAME_PLACEHOLDER = "[Name]";
 
     public static string GOTO = "goto";
+    public static string GAME = "game";
     public static string APPEARAT_INSTANTLY = "appearAtInstantly";
 
     //Localization
@@ -149,4 +150,6 @@ public class Constants : MonoBehaviour
     public static float DEFAULT_FAST_MULTIPLIER = 3f;
 
     public static char SHOICEDELIMITER = '\n';
+    public static string CONFIRM_COVER_SAVE_FILE = "确认覆盖现有存档吗？";
+    public static string CONFIRM_DELETE_SAVE_FILE = "确认删除存档吗？";
 }

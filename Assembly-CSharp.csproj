@@ -68,7 +68,9 @@
     <Compile Include="Assets\Scripts\CSVReader\CSVReader.cs" />
     <Compile Include="Assets\Scripts\test.cs" />
     <Compile Include="Assets\Scripts\CreditsScroller.cs" />
+    <Compile Include="Assets\Scripts\MiniGameManager.cs" />
     <Compile Include="Assets\Scripts\Controller\FadeInEffect.cs" />
+    <Compile Include="Assets\Scripts\SaveSlot.cs" />
     <Compile Include="Assets\Scripts\UI\SaveLoadManager.cs" />
     <Compile Include="Assets\Scripts\CharacterImgController.cs" />
   </ItemGroup>

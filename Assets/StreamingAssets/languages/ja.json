@@ -12,9 +12,10 @@
     "previous_page": "前へ",
     "next_page": "次へ",
     "back": "戻る",
-    "close":"关闭",
+    "close":"閉鎖します",
     "Please Enter Your Name":"お名前を入力願います：",
     "confirm":"確認します",
+    "cancel":"取り消します",
     "display_mode":"表示モードです",
     "resolution":"解像度です",
     "window":"ウィンドウです",
@@ -22,5 +23,7 @@
     "reset":"元の設定に戻します",
     "volume":"ボリュームです",
     "bgm":"背景音です",
-    "voice":"人声の大きさ"
+    "voice":"人声の大きさ",
+    "override_sav":"既存のアーカイブの上書きを確認しますか?",
+    "delete_sav":"アーカイブの削除を確認しますか?"
 }

@@ -15,6 +15,7 @@
     "close":"close",
     "Please Enter Your Name":"Please Enter Your Name",
     "confirm":"Confirm",
+    "cancel":"cancel",
     "reset": "Restore the default Settings",
     "display_mode":"displayMode",
     "resolution":"resolution",
@@ -22,5 +23,7 @@
     "fullscreen":"fullscreen",
     "volume":"volume",
     "bgm":"bgm",
-    "voice":"voice"
+    "voice":"voice",
+    "override_sav":"Are you sure to overwrite the existing archives?",
+    "delete_sav":"Are you sure you want to delete the archive?"
 }

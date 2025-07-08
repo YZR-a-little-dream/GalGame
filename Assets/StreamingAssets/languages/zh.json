@@ -15,6 +15,7 @@
     "close":"关闭",
     "Please Enter Your Name":"请输入您的名字：",
     "confirm":"确认",
+    "cancel":"取消",
     "reset":"恢复默认设置",
     "display_mode":"显示模式",
     "resolution":"分辨率",
@@ -22,5 +23,7 @@
     "fullscreen":"全屏",
     "volume":"音量大小",
     "bgm":"背景音大小",
-    "voice":"人声大小"
+    "voice":"人声大小",
+    "override_sav":"确认覆盖现有存档吗？",
+    "delete_sav":"确认删除存档吗？"
 }

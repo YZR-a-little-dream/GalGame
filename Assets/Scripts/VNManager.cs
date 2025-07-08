@@ -13,6 +13,7 @@ using Unity.Burst.CompilerServices;
 using Unity.VisualScripting;
 using System.Linq;
 using UnityEngine.Rendering.Universal;
+using System.Linq.Expressions;
 
 public class VNManager : SingletonMonoBase<VNManager>
 {
@@ -44,7 +45,6 @@ public class VNManager : SingletonMonoBase<VNManager>
     private readonly string excelFileExtension = Constants.STORY_FILE_EXTENSION;
 
     private string saveFolderPath;
-    private byte[] screenshotData;          //保存截图数据
     private string currentSpeakingContent;  //保存当前对话内容
 
     private List<ExcelReader.ExcelData> storyData;
@@ -84,13 +84,33 @@ public class VNManager : SingletonMonoBase<VNManager>
     #region life cycle
     void Start()
     {
-        GameManager.Instance.currentScene = Constants.GAME_SCENE;
-        currentLine = GameManager.Instance.currentLineIndex;
-        InitializeSaveFilePath();
+        GameManager GM = GameManager.Instance;
+        GM.hasStarted = true;
+        GM.currentScene = Constants.GAME_SCENE;
+        if (GM.pendingData != null)
+        {
+            GameManager.saveData saveData = GM.pendingData;
+            GM.pendingData = null;
+
+            GM.currentStoryFile = saveData.saveStoryFileName;
+            GM.currentLineIndex = saveData.savedLine;
+
+            saveData.savedHistoryRecords.RemoveLast();      //因为会进行DisplayNextLine()方法
+                                                            //所以应该进行移除最后一条记录
+            GM.historyRecords = saveData.savedHistoryRecords;   
+
+            GM.playerName = saveData.savedPlayerName;
+
+            GM.currentBGImg = saveData.savedBGImg;
+            GM.currentBGMusic = saveData.savedBGMusic;
+            GM.curCharacterName_ActionDic = saveData.savedCharacterName_ActionDic;
+        }
+        currentLine = GM.currentLineIndex;
         bottomButtonsAddListener();
         InitializeImage();
-        LoadStory(GameManager.Instance.currentStoryFile);
+        LoadStory(GM.currentStoryFile);
         DisplayNextLine();
+        //InitializeSaveFilePath();
         //InitializeAndLoadStory(GameManager.Instance.currentStoryFile, GameManager.Instance.currentLineIndex);
     }
 
@@ -130,14 +150,14 @@ public class VNManager : SingletonMonoBase<VNManager>
     #endregion
 
     #region Initalization
-    private void InitializeSaveFilePath()
-    {
-        saveFolderPath = Path.Combine(Application.persistentDataPath, Constants.SAVE_FILE_PATH);
-        if(!Directory.Exists(saveFolderPath))
-        {
-            Directory.CreateDirectory(saveFolderPath);
-        }
-    }
+    // private void InitializeSaveFilePath()
+    // {
+    //     saveFolderPath = Path.Combine(Application.persistentDataPath, Constants.SAVE_FILE_PATH);
+    //     if(!Directory.Exists(saveFolderPath))
+    //     {
+    //         Directory.CreateDirectory(saveFolderPath);
+    //     }
+    // }
 
     // public void startGame(string fileName,int defaultStartLine)
     // {
@@ -272,6 +292,11 @@ public class VNManager : SingletonMonoBase<VNManager>
                 currentLine = Constants.DEFAULT_STORY_START_LINE;
                 DisplayNextLine();
             }
+
+            if (storyData[currentLine].speakerName == Constants.GAME)
+            {
+                //LoadMiniGame();
+            }
             return;
         }
 
@@ -320,14 +345,12 @@ public class VNManager : SingletonMonoBase<VNManager>
 
         if(NotNullOrEmpty(data.bgImageFileName))
         {
-            //FIXME: 删除对应表格的last内容 同时还要修改excelReader
             GameManager.Instance.currentBGImg = data.bgImageFileName;
             UpdateBackgroundImage(data.bgImageFileName);
         }
 
         if(NotNullOrEmpty(data.bgMusicFileName))
         {
-            //FIXME: 删除对应表格的last内容 同时还要修改excelReader
             GameManager.Instance.currentBGMusic = data.bgMusicFileName;
             PlayBackgroundMusic(data.bgMusicFileName);
         }
@@ -369,23 +392,23 @@ public class VNManager : SingletonMonoBase<VNManager>
         //     {
         //         PlayBackgroundMusic(data.lastBgMusic);
         //     }
-        
-        //TODO: 角色立绘
+
+        //TODO: 角色立绘        
         if (GameManager.Instance.curCharacterName_ActionDic != null)
-        {
-            foreach (var ChracterImg_Pos in GameManager.Instance.curCharacterName_ActionDic)
             {
-                int characterImgIndex = characterImgController.GetChracterImgIndexByName(characterImageArr, ChracterImg_Pos.Key);
-                if (characterImgIndex != Constants.DEFAULT_UNEXiST_NUMBER)
+                foreach (var ChracterImg_Pos in GameManager.Instance.curCharacterName_ActionDic)
                 {
-                    UpdateCharacterImage(ChracterImg_Pos.Value, ChracterImg_Pos.Key, characterImageArr[characterImgIndex]);
-                }
-                else
-                {
-                    Debug.LogError("立绘名字不存在" + ChracterImg_Pos.Key);
+                    int characterImgIndex = characterImgController.GetChracterImgIndexByName(characterImageArr, ChracterImg_Pos.Key);
+                    if (characterImgIndex != Constants.DEFAULT_UNEXiST_NUMBER)
+                    {
+                        UpdateCharacterImage(ChracterImg_Pos.Value, ChracterImg_Pos.Key, characterImageArr[characterImgIndex]);
+                    }
+                    else
+                    {
+                        Debug.LogError("立绘名字不存在" + ChracterImg_Pos.Key);
+                    }
                 }
             }
-        }
           
     }
 
@@ -706,9 +729,30 @@ public class VNManager : SingletonMonoBase<VNManager>
         // screenshotData = screenshot.EncodeToPNG();
         // SaveLoadManager.Instance.showSavePanel(SaveGame);
         // OpenGameUI();
-
+        SaveData();
         GameManager.Instance.currentSaveLoadMode = GameManager.SaveLoadMode.Save;
         SceneManager.LoadScene(Constants.SAVE_LOAD_SCENE);
+    }
+
+    private void SaveData()
+    {
+        CloseGameUI();
+        Texture2D screenshot = screenShotter.CaptureScreenshot();
+        OpenGameUI();
+
+        GameManager gm = GameManager.Instance;
+        GameManager.Instance.pendingData = new GameManager.saveData
+        {
+            saveStoryFileName = currentStoryFileName,
+            savedLine = currentLine - 1 ,                   //读取数据后会进行DisplayNextLine方法
+                                                            //所以数据要减一
+            savedScreenshotData = screenshot.EncodeToPNG(),
+            savedHistoryRecords = gm.historyRecords,
+            savedPlayerName = gm.playerName,
+            savedBGImg = gm.currentBGImg,
+            savedBGMusic = gm.currentBGMusic,
+            savedCharacterName_ActionDic = gm.curCharacterName_ActionDic,
+        };
     }
 
     // private void SaveGame(int slotIndex)

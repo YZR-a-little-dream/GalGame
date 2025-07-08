@@ -13,10 +13,16 @@ public class SaveLoadManager : SingletonMonoBase<SaveLoadManager>
 {
 
     public TextMeshProUGUI panelTitle;
-    public Button[] saveLoadButtons;
+    public SaveSlot[] slots;        // 存档槽位数组
     public Button prevPageButton;
     public Button nextPageButton;
     public Button backButton;
+
+    //新子界面提示是否删除或覆盖当前存档
+    public GameObject confirmPanel;
+    public TextMeshProUGUI confirmText;
+    public Button confirmButton;
+    public Button cancelButton;
 
     private bool isLoad => GameManager.Instance.currentSaveLoadMode == GameManager.SaveLoadMode.Load;
 
@@ -26,6 +32,8 @@ public class SaveLoadManager : SingletonMonoBase<SaveLoadManager>
 
     private void Start()
     {
+        panelTitle.text = isLoad ? LM.GLV(Constants.LOAD_GAME) : LM.GLV(Constants.SAVE_GAME);
+
         prevPageButton.GetComponentInChildren<TextMeshProUGUI>().text = LM.GLV(Constants.PREV_PAGE);
         nextPageButton.GetComponentInChildren<TextMeshProUGUI>().text = LM.GLV(Constants.NEXT_PAGE);
         backButton.GetComponentInChildren<TextMeshProUGUI>().text = LM.GLV(Constants.BACK);
@@ -35,9 +43,9 @@ public class SaveLoadManager : SingletonMonoBase<SaveLoadManager>
         nextPageButton.onClick.AddListener(OnNextPageBtnClick);
         backButton.onClick.AddListener(OnBackBtnClick);
 
-        panelTitle.text = isLoad ? LM.GLV(Constants.LOAD_GAME) : LM.GLV(Constants.SAVE_GAME);
-        UpdateUI();
+        confirmPanel.SetActive(false);
 
+        RefreshPage();
     }
 
     // public void ShowSaveLoadUI(bool isSave)
@@ -68,63 +76,73 @@ public class SaveLoadManager : SingletonMonoBase<SaveLoadManager>
     //     saveLoadPanel.SetActive(true);
     // }
 
-    private void UpdateUI()
+    private void RefreshPage()
     {
-        for (int i = 0; i < Constants.SLOTS_PER_PAGE; i++)
+        for (int i = 0; i < slots.Length; i++)
         {
             int slotIndex = i + currentPageIndex * Constants.SLOTS_PER_PAGE;
             if (slotIndex < Constants.TOTAL_SLOTS)
             {
-                UpdateSaveLoadButtons(saveLoadButtons[i], slotIndex);
-                LoadstorylineAndScreenshots(saveLoadButtons[i], slotIndex);
+                slots[i].gameObject.SetActive(true);
+                slots[i].Init(this, slotIndex);
+                slots[i].Refresh();
             }
             else
             {
-                saveLoadButtons[i].gameObject.SetActive(false);
+                slots[i].gameObject.SetActive(false);
             }
         }
     }
 
-    private void UpdateSaveLoadButtons(Button slotBtn, int slotIndex)
-    {
-        slotBtn.gameObject.SetActive(true);
-        slotBtn.interactable = true;
+    // private void UpdateSaveLoadButtons(Button slotBtn, int slotIndex)
+    // {
+    //     slotBtn.gameObject.SetActive(true);
+    //     slotBtn.interactable = true;
 
-        string savePath = GenetateDataPath(slotIndex);
-        bool fileExists = File.Exists(savePath);
+    //     string savePath = GameManager.Instance.GenetateDataPath(slotIndex);
+    //     bool fileExists = File.Exists(savePath);
 
-        if (isLoad && !fileExists)       //如果是记载游戏并且存档不存在，存档不可互动
-        {
-            slotBtn.interactable = false;
-        }
+    //     if (isLoad && !fileExists)       //如果是记载游戏并且存档不存在，存档不可互动
+    //     {
+    //         slotBtn.interactable = false;
+    //     }
 
-        //显示文本和图片
-        var textComponents = slotBtn.GetComponentsInChildren<TextMeshProUGUI>();
-        textComponents[0].text = null;
-        textComponents[1].text = (slotIndex + 1) + Constants.COLON + Constants.Empty_SLOT;
-        slotBtn.GetComponentInChildren<RawImage>().texture = null;
+    //     //显示文本和图片
+    //     var textComponents = slotBtn.GetComponentsInChildren<TextMeshProUGUI>();
+    //     textComponents[0].text = null;
+    //     textComponents[1].text = (slotIndex + 1) + Constants.COLON + Constants.Empty_SLOT;
+    //     slotBtn.GetComponentInChildren<RawImage>().texture = null;
 
-        slotBtn.onClick.RemoveAllListeners();
-        slotBtn.onClick.AddListener(() => OnButtonClick(slotBtn, slotIndex));
-    }
+    //     slotBtn.onClick.RemoveAllListeners();
+    //     slotBtn.onClick.AddListener(() => OnButtonClick(slotBtn, slotIndex));
+    // }
 
-    private void OnButtonClick(Button slotBtn, int slotIndex)
-    {
-        //TODO: 暂定
-    }
+    // private void OnButtonClick(Button slotBtn, int slotIndex)
+    // {
+    //     if (!isLoad)
+    //     {
+    //         GameManager.Instance.Save(slotIndex);
+    //         LoadstorylineAndScreenshots(slotBtn, slotIndex);
+    //     }
+    //     else
+    //     {
+    //         GameManager.Instance.Load(slotIndex);
+    //         SceneManager.LoadScene(Constants.GAME_SCENE);
+    //     }
+    // }
 
     private void OnPrevPageBtnClick()
     {
         currentPageIndex =
         (currentPageIndex - 1 + Constants.TOTAL_SLOTS / Constants.SLOTS_PER_PAGE) % (Constants.TOTAL_SLOTS / Constants.SLOTS_PER_PAGE);
-        UpdateUI();
+        RefreshPage();
 
     }
 
     private void OnNextPageBtnClick()
     {
         currentPageIndex = (currentPageIndex + 1) % (Constants.TOTAL_SLOTS / Constants.SLOTS_PER_PAGE);
-        UpdateUI();
+        RefreshPage();
     }
 
     private void OnBackBtnClick()
@@ -134,34 +152,98 @@ public class SaveLoadManager : SingletonMonoBase<SaveLoadManager>
         {
             GameManager.Instance.historyRecords.RemoveLast();
         }
+        GameManager.Instance.pendingData = null;
+
         SceneManager.LoadScene(sceneName);
     }
 
-    private void LoadstorylineAndScreenshots(Button slotBtn, int slotIndex)
-    {
-        // load storyline and screenshotss
-        string savePath = GenetateDataPath(slotIndex);
-        if (File.Exists(savePath))
-        {
-            string json = File.ReadAllText(savePath);
-            var saveData = JsonConvert.DeserializeObject<GameManager.saveData>(json);
-            if (saveData.savedScreenshotData != null)
-            {
-                Texture2D screenshot = new Texture2D(2, 2);
-                screenshot.LoadImage(saveData.savedScreenshotData);
-                slotBtn.GetComponentInChildren<RawImage>().texture = screenshot;
-            }
-            if (saveData.savedHistoryRecords.Last != null)
-            {
-                //FIXME: save and load
-                TextMeshProUGUI[] textComponents = slotBtn.GetComponentsInChildren<TextMeshProUGUI>();
-                textComponents[0].text = saveData.currentSpeekingContent;
-                textComponents[1].text = File.GetLastWriteTime(savePath).ToString("G");
-            }
+    // private void LoadstorylineAndScreenshots(Button slotBtn, int slotIndex)
+    // {
+    //     // load storyline and screenshotss
+    //     string savePath = GameManager.Instance.GenetateDataPath(slotIndex);
+    //     if (File.Exists(savePath))
+    //     {
+    //         string json = File.ReadAllText(savePath);
+    //         var saveData = JsonConvert.DeserializeObject<GameManager.saveData>(json);
+    //         if (saveData.savedScreenshotData != null)
+    //         {
+    //             Texture2D screenshot = new Texture2D(2, 2);
+    //             screenshot.LoadImage(saveData.savedScreenshotData);
+    //             slotBtn.GetComponentInChildren<RawImage>().texture = screenshot;
+    //         }
+    //         if (saveData.savedHistoryRecords.Last != null)
+    //         {
+    //             //FIXME: save and load 本地化
+    //             TextMeshProUGUI[] textComponents = slotBtn.GetComponentsInChildren<TextMeshProUGUI>();
+    //             textComponents[0].text = saveData.savedHistoryRecords.Last.Value;
+    //             textComponents[1].text = File.GetLastWriteTime(savePath).ToString("G");
+    //         }
+    //     }
+    //     else
+    //     {
+    //         //Debug.Log("未找到当前存档路径");
+    //     }
+    // }
 
+    public void HandleEmptySlot(int slotIndex, SaveSlot saveSlot)
+    {
+        SaveToSlot(slotIndex, saveSlot);
+    }
+
+    public void HandleExistingSlot(int slotIndex, SaveSlot saveSlot)
+    {
+        if (isLoad)
+        {
+            GameManager.Instance.Load(slotIndex);
+            SceneManager.LoadScene(Constants.GAME_SCENE);
+        }
+        else
+        {
+            showConfirmPanel(
+                LM.GLV(Constants.CONFIRM_COVER_SAVE_FILE),
+                () => { SaveToSlot(slotIndex, saveSlot); }
+            );
         }
     }
 
-    private string GenetateDataPath(int slotIndex)
-        => Path.Combine(Application.persistentDataPath, Constants.SAVE_FILE_PATH, slotIndex + Constants.SAVE_FILE_EXTENSION);
+    public void RequestDeleteSlot(int slotIndex, SaveSlot deleteSlot)
+    {
+        showConfirmPanel(
+            LM.GLV(Constants.CONFIRM_DELETE_SAVE_FILE),
+            () => { DeleteToSlot(slotIndex, deleteSlot); }
+        );
+    }
+
+    private void showConfirmPanel(string message, Action onYes)
+    {
+        confirmText.text = message;
+        confirmPanel.SetActive(true);
+
+        confirmButton.onClick.RemoveAllListeners();
+        confirmButton.onClick.AddListener(() =>
+        {
+            confirmPanel.SetActive(false);
+            onYes?.Invoke();
+        }
+        );
+
+        cancelButton.onClick.RemoveAllListeners();
+        cancelButton.onClick.AddListener(() =>
+        {
+            confirmPanel.SetActive(false);
+        }
+        );
+    }
+
+    private void SaveToSlot(int slotIndex, SaveSlot saveSlot)
+    {
+        GameManager.Instance.Save(slotIndex);
+        saveSlot.Refresh();
+    }
+
+    private void DeleteToSlot(int slotIndex, SaveSlot deleteSlot)
+    {
+        File.Delete(GameManager.Instance.GenetateDataPath(slotIndex));
+        deleteSlot.Refresh();
+    }
 }

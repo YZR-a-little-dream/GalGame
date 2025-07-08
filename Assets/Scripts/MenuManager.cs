@@ -86,7 +86,6 @@ public class MenuManager : SingletonMonoBase<MenuManager>
 
     public void StartGame()
     {
-        GameManager.Instance.hasStarted = true;
         GameManager.Instance.currentStoryFile = Constants.DEFAULT_STORY_FILE_NAME;
         GameManager.Instance.currentLineIndex = Constants.DEFAULT_STORY_START_LINE;
         GameManager.Instance.currentBGImg = string.Empty;

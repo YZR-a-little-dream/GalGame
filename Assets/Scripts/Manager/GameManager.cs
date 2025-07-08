@@ -1,10 +1,26 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
+using Newtonsoft.Json;
 using TMPro;
 using UnityEngine;
 
 public class GameManager : SingletonMonoBase<GameManager>
 {
+    public class saveData
+    {
+        public string saveStoryFileName;        //当前保存的故事文件名
+        public int savedLine;                   //当前保存的行索引
+        public byte[] savedScreenshotData;      //截图数据
+        public LinkedList<string> savedHistoryRecords;              //历史存档
+        public string savedBGImg;
+        public string savedBGMusic;
+        //立绘名字 立绘坐标
+        public Dictionary<string, string> savedCharacterName_ActionDic;    //人物立绘列表
+        public string savedPlayerName;
+    }
+
     //FIXME:玩家姓名
     public string playerName = "我是玩家";
     public string currentScene;
@@ -33,24 +49,29 @@ public class GameManager : SingletonMonoBase<GameManager>
     public Dictionary<string, int> MaxReachedLineIndicesDict = new Dictionary<string, int>();
 
 
-    public enum SaveLoadMode { Save, Load }
-    public SaveLoadMode currentSaveLoadMode;
+    public enum SaveLoadMode { None, Save, Load }
+    public SaveLoadMode currentSaveLoadMode{ get; set; } = SaveLoadMode.None;
 
-    public class saveData
-    {
-        public string saveStoryFileName;        //当前保存的故事文件名
-        public int savedLine;                   //当前保存的行索引
-        public string currentSpeekingContent;
-        public byte[] savedScreenshotData;
-        public Dictionary<string, string> characterImgDicts;        //人物立绘列表
-
-        public LinkedList<string> savedHistoryRecords;              //历史存档
-        public string savedPlayerNmae;
-    }
+    public saveData pendingData;                    //待处理数据
 
     protected override void Awake()
     {
         base.Awake();
         DontDestroyOnLoad(gameObject);
     }
+
+    public void Save(int slotIndex)
+    {
+        string path = GenetateDataPath(slotIndex);
+        File.WriteAllText(path, JsonConvert.SerializeObject(pendingData, Formatting.Indented));
+    }
+
+    public void Load(int slotIndex)
+    {
+        string path = GenetateDataPath(slotIndex);
+        pendingData = JsonConvert.DeserializeObject<saveData>(File.ReadAllText(path));
+    }
+
+    public string GenetateDataPath(int slotIndex)
+        => Path.Combine(Application.persistentDataPath, Constants.SAVE_FILE_PATH, slotIndex + Constants.SAVE_FILE_EXTENSION);
 }
