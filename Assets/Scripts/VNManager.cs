@@ -39,7 +39,8 @@ public class VNManager : SingletonMonoBase<VNManager>
     //右下角的控制按钮
     public GameObject bottomButtonsPanel;
     public Button autoButton,skipButton,saveButton,loadButton,
-                    historyButton,settingsButton,homeButton,closeButton;
+                    historyButton,settingsButton,homeButton,
+                    closeButton,quickSaveButton,quickLoadButton;
 
     private readonly int defaultStartLine = Constants.DEFAULT_STORY_START_LINE;
     private readonly string excelFileExtension = Constants.STORY_FILE_EXTENSION;
@@ -171,6 +172,8 @@ public class VNManager : SingletonMonoBase<VNManager>
         skipButton.onClick.AddListener(OnSkipButtonClick);
         saveButton.onClick.AddListener(OnSaveButtonClick);
         loadButton.onClick.AddListener(OnLoadButtonClick);
+        quickSaveButton.onClick.AddListener(OnQuickSaveButtonClick);
+        quickLoadButton.onClick.AddListener(OnQuickLoadButtonClick);
         historyButton.onClick.AddListener(OnHistoryClick);
         settingsButton.onClick.AddListener(OnSettingButtonClick);
         homeButton.onClick.AddListener(OnHomeButtonClick);
@@ -743,6 +746,23 @@ public class VNManager : SingletonMonoBase<VNManager>
 
     #endregion
     #region save 
+
+    private void OnQuickSaveButtonClick()
+    {
+        SaveData();
+        GameManager.Instance.Save(Constants.QUICK_SAVE_SLOT);    
+    }
+
+    private void OnQuickLoadButtonClick()
+    {
+        string datapath = GameManager.Instance.GenetateDataPath(Constants.QUICK_SAVE_SLOT);
+        if (File.Exists(datapath))
+        {
+            GameManager.Instance.Load(Constants.QUICK_SAVE_SLOT);
+            SceneManager.LoadScene(Constants.GAME_SCENE);
+        }
+    }
+    
     private void OnSaveButtonClick()
     {
         // CloseGameUI();
