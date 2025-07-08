@@ -92,7 +92,8 @@ public class VNManager : SingletonMonoBase<VNManager>
             GameManager.saveData saveData = GM.pendingData;
             GM.pendingData = null;
 
-            GM.currentStoryFile = saveData.saveStoryFileName;
+            GM.currentStoryFile = saveData.savedStoryFileName;
+            saveData.savedLine--;                           //读取数据后会进行DisplayNextLine方法
             GM.currentLineIndex = saveData.savedLine;
 
             saveData.savedHistoryRecords.RemoveLast();      //因为会进行DisplayNextLine()方法
@@ -264,7 +265,7 @@ public class VNManager : SingletonMonoBase<VNManager>
             maxReachedLineIndex = currentLine;
             GameManager.Instance.MaxReachedLineIndicesDict[currentStoryFileName] = maxReachedLineIndex;
         }
-
+        //Debug.Log(currentLine + " " + storyData.Count);
         //到达表格最后一行
         if (currentLine >= storyData.Count - 1)
         {
@@ -278,7 +279,8 @@ public class VNManager : SingletonMonoBase<VNManager>
             if (storyData[currentLine].speakerName == Constants.END_OF_STORY)
             {
                 GameManager.Instance.hasStarted = false;
-                SceneManager.LoadScene(Constants.CREDITS_SCENE);
+                //FIXME:演示场景：SceneManager.LoadScene(Constants.CREDITS_SCENE);
+                SceneManager.LoadScene(Constants.MENU_SCENE);
             }
 
             if (storyData[currentLine].speakerName == Constants.CHOICE)
@@ -293,9 +295,10 @@ public class VNManager : SingletonMonoBase<VNManager>
                 DisplayNextLine();
             }
 
+            Debug.Log(storyData[currentLine].speakerName + " " + Constants.GAME);
             if (storyData[currentLine].speakerName == Constants.GAME)
             {
-                //LoadMiniGame();
+                LoadMiniGame();
             }
             return;
         }
@@ -445,6 +448,24 @@ public class VNManager : SingletonMonoBase<VNManager>
         currentLine = Constants.DEFAULT_STORY_START_LINE;
         LoadStory(selectedChoice);
         DisplayNextLine();
+    }
+
+    private void LoadMiniGame()
+    {
+        var data = storyData[currentLine];
+        GameManager.Instance.WinStoryFileName = data.avatorImageFileName;
+        GameManager.Instance.LoseStoryFileName = data.vocalAudioFileName;
+        SaveData();
+
+        // +1是因为没有进行DisplayNextLine()方法，而是直接跳转到另一个文件
+        GameManager.Instance.pendingData.savedLine = Constants.DEFAULT_STORY_START_LINE + 1;
+
+        GameManager.Instance.pendingData.savedHistoryRecords.AddLast
+            (storyData[currentLine].speakerName
+            + Constants.COLON
+            + storyData[currentLine].speakingContent);
+
+        SceneManager.LoadScene(data.speakingContent);
     }
 
     #endregion
@@ -743,9 +764,9 @@ public class VNManager : SingletonMonoBase<VNManager>
         GameManager gm = GameManager.Instance;
         GameManager.Instance.pendingData = new GameManager.saveData
         {
-            saveStoryFileName = currentStoryFileName,
-            savedLine = currentLine - 1 ,                   //读取数据后会进行DisplayNextLine方法
-                                                            //所以数据要减一
+            savedStoryFileName = currentStoryFileName,
+            savedLine = currentLine,                   
+
             savedScreenshotData = screenshot.EncodeToPNG(),
             savedHistoryRecords = gm.historyRecords,
             savedPlayerName = gm.playerName,

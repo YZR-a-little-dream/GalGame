@@ -10,7 +10,7 @@ public class GameManager : SingletonMonoBase<GameManager>
 {
     public class saveData
     {
-        public string saveStoryFileName;        //当前保存的故事文件名
+        public string savedStoryFileName;        //当前保存的故事文件名
         public int savedLine;                   //当前保存的行索引
         public byte[] savedScreenshotData;      //截图数据
         public LinkedList<string> savedHistoryRecords;              //历史存档
@@ -37,6 +37,8 @@ public class GameManager : SingletonMonoBase<GameManager>
     /// </summary>
     public Dictionary<string, string> curCharacterName_ActionDic;
 
+    public string WinStoryFileName;             //胜利结局的故事文件名
+    public string LoseStoryFileName;            //失败结局的故事文件名
     public bool hasStarted;                     //判断菜单界面的继续按钮是否可用
 
     //保存已解锁的背景
@@ -53,6 +55,7 @@ public class GameManager : SingletonMonoBase<GameManager>
     public SaveLoadMode currentSaveLoadMode{ get; set; } = SaveLoadMode.None;
 
     public saveData pendingData;                    //待处理数据
+
 
     protected override void Awake()
     {
