@@ -6,21 +6,8 @@ using Newtonsoft.Json;
 using TMPro;
 using UnityEngine;
 
-public class GameManager : SingletonMonoBase<GameManager>
+public class GameManager : SingletonDontDestory<GameManager>
 {
-    public class saveData
-    {
-        public string savedStoryFileName;        //当前保存的故事文件名
-        public int savedLine;                   //当前保存的行索引
-        public byte[] savedScreenshotData;      //截图数据
-        public LinkedList<string> savedHistoryRecords;              //历史存档
-        public string savedBGImg;
-        public string savedBGMusic;
-        //立绘名字 立绘坐标
-        public Dictionary<string, string> savedCharacterName_ActionDic;    //人物立绘列表
-        public string savedPlayerName;
-    }
-
     //FIXME:玩家姓名
     public string playerName = "我是玩家";
     public string currentScene;
@@ -31,11 +18,14 @@ public class GameManager : SingletonMonoBase<GameManager>
     public string currentBGImg;
     public string currentBGMusic;
 
-    //TODO:@1 立绘是否显示 立绘图片 立绘位置  29期 04:38
+    //立绘是否显示 立绘图片 立绘位置  29期 04:38
     /// <summary>
     /// string:立绘名字  string:立绘坐标
     /// </summary>
-    public Dictionary<string, string> curCharacterName_ActionDic;
+    //public Dictionary<string, string> curCharacterName_ActionDic;
+
+    //当前立绘数据
+    public List<characterSaveData> currentCharacterData = new List<characterSaveData>(); 
 
     public string WinStoryFileName;             //胜利结局的故事文件名
     public string LoseStoryFileName;            //失败结局的故事文件名
@@ -56,11 +46,24 @@ public class GameManager : SingletonMonoBase<GameManager>
 
     public saveData pendingData;                    //待处理数据
 
-
-    protected override void Awake()
+    public class characterSaveData
     {
-        base.Awake();
-        DontDestroyOnLoad(gameObject);
+        public string characterID;          //角色ID
+        public float positionX;            //角色位置X
+        public string characterEmotion;     //角色表情
+    }
+
+    public class saveData
+    {
+        public string savedStoryFileName;        //当前保存的故事文件名
+        public int savedLine;                   //当前保存的行索引
+        public byte[] savedScreenshotData;      //截图数据
+        public LinkedList<string> savedHistoryRecords;              //历史存档
+        public string savedBGImg;
+        public string savedBGMusic;
+        //立绘名字 立绘坐标
+        public List<characterSaveData> savedCharacters;
+        public string savedPlayerName;
     }
 
     public void Save(int slotIndex)

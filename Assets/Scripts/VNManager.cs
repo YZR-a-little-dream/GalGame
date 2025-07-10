@@ -15,7 +15,7 @@ using System.Linq;
 using UnityEngine.Rendering.Universal;
 using System.Linq.Expressions;
 
-public class VNManager : SingletonMonoBase<VNManager>
+public class VNManager : SingletonDontDestory<VNManager>
 {
     //public CharacterImgController characterImgController;
 
@@ -34,7 +34,7 @@ public class VNManager : SingletonMonoBase<VNManager>
     public Image backgroundImage;           //背景图片
     //public AudioSource backgroundMusic;     //背景音乐
 
-    public Image[] characterImageArr;            //角色立绘列表  //TODO:@1 角色立绘修改
+    //public Image[] characterImageArr;            //角色立绘列表  //TODO:@1 角色立绘修改
 
     //右下角的控制按钮
     public GameObject bottomButtonsPanel;
@@ -59,7 +59,6 @@ public class VNManager : SingletonMonoBase<VNManager>
 
     private int maxReachedLineIndex = 0;
 
-    [SerializeField] private CharacterImgController characterImgController;
 
     /// <summary>
     /// string:chracterImgName, string:chracterImgLastPos
@@ -81,6 +80,8 @@ public class VNManager : SingletonMonoBase<VNManager>
     //private LinkedList<historyData> historyRecords;
 
     #endregion
+
+
 
     #region life cycle
     void Start()
@@ -105,7 +106,7 @@ public class VNManager : SingletonMonoBase<VNManager>
 
             GM.currentBGImg = saveData.savedBGImg;
             GM.currentBGMusic = saveData.savedBGMusic;
-            GM.curCharacterName_ActionDic = saveData.savedCharacterName_ActionDic;
+            GM.currentCharacterData = saveData.savedCharacters ?? new List<GameManager.characterSaveData>();
         }
         currentLine = GM.currentLineIndex;
         bottomButtonsAddListener();
@@ -209,10 +210,10 @@ public class VNManager : SingletonMonoBase<VNManager>
         avatorImage.gameObject.SetActive(false);
         //vocalAudio.gameObject.SetActive(false);
 
-        foreach (var img in characterImageArr)
-        {
-            img.gameObject.SetActive(false);
-        }
+        // foreach (var img in characterImageArr)
+        // {
+        //     img.gameObject.SetActive(false);
+        // }
 
         //choicePanel.SetActive(false);
         //historyRecords = new LinkedList<historyData>();
@@ -360,14 +361,53 @@ public class VNManager : SingletonMonoBase<VNManager>
             GameManager.Instance.currentBGMusic = data.bgMusicFileName;
             PlayBackgroundMusic(data.bgMusicFileName);
         }
-        
-        //TODO: @1 立绘动态效果
-        if (NotNullOrEmpty(data.characterAction))
+
+        // 立绘动态效果
+        // if (NotNullOrEmpty(data.characterAction))
+        // {
+        //     if (data.characterNum != Constants.DEFAULT_UNEXiST_NUMBER)
+        //     {
+        //         characterImgController.GetCharcterImgsPositionDic();
+        //         UpdateCharacterImage(data.characterAction, data.characterImgFileName, characterImageArr[data.characterNum]);
+        //     }
+        // }
+
+        //处理角色动作
+        foreach (var cmd in data.characterCommands)
         {
-            if (data.characterNum != Constants.DEFAULT_UNEXiST_NUMBER)
+            Debug.Log($"Processing command: {cmd.characterAction} for character: {cmd.characterID}");
+            if (cmd.characterAction == Constants.CHARACTERACTION_DISAPPEAR)
             {
-                characterImgController.GetCharcterImgsPositionDic();
-                UpdateCharacterImage(data.characterAction, data.characterImgFileName, characterImageArr[data.characterNum]);
+                GameManager.Instance.currentCharacterData.
+                    RemoveAll(c => c.characterID == cmd.characterID);
+                CharacterManager.Instance.HideCharacter(cmd.characterID);
+            }
+            else
+            {
+                var state = new GameManager.characterSaveData
+                {
+                    characterID = cmd.characterID,
+                    characterEmotion = cmd.characterEmotion,
+                    positionX = cmd.positionX
+                };
+
+                if (GameManager.Instance.currentCharacterData == null)
+                    GameManager.Instance.currentCharacterData = new List<GameManager.characterSaveData>();
+    
+                GameManager.Instance.currentCharacterData.
+                     RemoveAll(c => c.characterID == cmd.characterID);
+
+                GameManager.Instance.currentCharacterData
+                    .Add(state);
+
+                if (cmd.characterAction.StartsWith(Constants.CHARACTERACTION_APPEARAT))
+                {
+                    CharacterManager.Instance.showCharacter(
+                        cmd.characterID,
+                        new Vector2(cmd.positionX, 0f),
+                        cmd.characterEmotion
+                    );
+                }
             }
         }
 
@@ -400,22 +440,35 @@ public class VNManager : SingletonMonoBase<VNManager>
         //     }
 
         //TODO: 角色立绘        
-        if (GameManager.Instance.curCharacterName_ActionDic != null)
+        // if (GameManager.Instance.curCharacterName_ActionDic != null)
+        //     {
+        //         foreach (var ChracterImg_Pos in GameManager.Instance.curCharacterName_ActionDic)
+        //         {
+        //             int characterImgIndex = characterImgController.GetChracterImgIndexByName(characterImageArr, ChracterImg_Pos.Key);
+        //             if (characterImgIndex != Constants.DEFAULT_UNEXiST_NUMBER)
+        //             {
+        //                 UpdateCharacterImage(ChracterImg_Pos.Value, ChracterImg_Pos.Key, characterImageArr[characterImgIndex]);
+        //             }
+        //             else
+        //             {
+        //                 Debug.LogError("立绘名字不存在" + ChracterImg_Pos.Key);
+        //             }
+        //         }
+        //     }
+
+        CharacterManager.Instance.ClrarAll();
+        Debug.Log(GameManager.Instance.currentCharacterData);
+        if (GameManager.Instance.currentCharacterData != null)
+        {
+            foreach (var characterData in GameManager.Instance.currentCharacterData)
             {
-                foreach (var ChracterImg_Pos in GameManager.Instance.curCharacterName_ActionDic)
-                {
-                    int characterImgIndex = characterImgController.GetChracterImgIndexByName(characterImageArr, ChracterImg_Pos.Key);
-                    if (characterImgIndex != Constants.DEFAULT_UNEXiST_NUMBER)
-                    {
-                        UpdateCharacterImage(ChracterImg_Pos.Value, ChracterImg_Pos.Key, characterImageArr[characterImgIndex]);
-                    }
-                    else
-                    {
-                        Debug.LogError("立绘名字不存在" + ChracterImg_Pos.Key);
-                    }
-                }
+                CharacterManager.Instance.showCharacter(
+                    characterData.characterID,
+                    new Vector2(characterData.positionX, 0f),
+                    characterData.characterEmotion
+                );
             }
-          
+        }
     }
 
     private void RecordHistory(string speaker, string currentSpeakingContent)
@@ -792,7 +845,7 @@ public class VNManager : SingletonMonoBase<VNManager>
             savedPlayerName = gm.playerName,
             savedBGImg = gm.currentBGImg,
             savedBGMusic = gm.currentBGMusic,
-            savedCharacterName_ActionDic = gm.curCharacterName_ActionDic,
+            savedCharacters = gm.currentCharacterData,
         };
     }
 

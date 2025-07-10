@@ -90,8 +90,7 @@ public class MenuManager : SingletonMonoBase<MenuManager>
         GameManager.Instance.currentLineIndex = Constants.DEFAULT_STORY_START_LINE;
         GameManager.Instance.currentBGImg = string.Empty;
         GameManager.Instance.currentBGMusic = string.Empty;
-        //TODO: @1 立绘位置初始化
-        GameManager.Instance.curCharacterName_ActionDic = new Dictionary<string, string>();
+        GameManager.Instance.currentCharacterData = null;
         
         //FIXME: 历史记录
         GameManager.Instance.historyRecords = new LinkedList<string>();

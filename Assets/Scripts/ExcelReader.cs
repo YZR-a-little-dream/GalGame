@@ -3,11 +3,23 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using ExcelDataReader;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class ExcelReader : MonoBehaviour
 {
-    public struct ExcelData
+    // 角色指令类
+    // 用于存储角色的动作、位置和表情等信息
+    public class CharacterCommand
+    {
+        public string characterID;          //角色ID
+        public string characterAction;      //角色动作
+        public float positionX;             //角色位置
+        public string characterEmotion;     //角色表情
+    }
+
+
+    public class ExcelData
     {
         public string speakerName;
         public string speakingContent;
@@ -16,9 +28,7 @@ public class ExcelReader : MonoBehaviour
         public string bgImageFileName;          //背景图片
         public string bgMusicFileName;          //背景音乐
 
-        public int characterNum;                //角色编号
-        public string characterAction;          //角色位置
-        public string characterImgFileName;     //角色立绘
+        public List<CharacterCommand> characterCommands = new(); //角色指令列表
 
     }
 
@@ -33,22 +43,81 @@ public class ExcelReader : MonoBehaviour
             {
                 do
                 {
-                    while (reader.Read())
+                    while (reader.Read()) // 读取每一行
                     {
-                        ExcelData data = new ExcelData();
-                        data.speakerName = GetCellString(reader, 0);
-                        data.speakingContent = GetCellString(reader, 1);
-                        data.avatorImageFileName = GetCellString(reader, 2);
-                        data.vocalAudioFileName = GetCellString(reader, 3);
-                        data.bgImageFileName = GetCellString(reader, 4);
-                        data.bgMusicFileName = GetCellString(reader, 5);
-                        // data.characterNum = reader.IsDBNull(6) ?
-                        // 0 :
-                        // int.TryParse(reader.GetValue(6)?.ToString(), out num) ? num : Constants.DEFAULT_UNEXiST_NUMBER;
-                        data.characterNum = GetCellInt(reader, 6);
-                        data.characterAction = GetCellString(reader, 7);
-                        data.characterImgFileName = GetCellString(reader, 8);
+                        if(reader.IsDBNull(0) && reader.IsDBNull(1))
+                        continue; // 如果第一列和第二列都为空，则跳过该行
 
+                        var data = new ExcelData
+                        {
+                            speakerName = GetCellString(reader, 0),
+                            speakingContent = GetCellString(reader, 1),
+                            avatorImageFileName = GetCellString(reader, 2),
+                            vocalAudioFileName = GetCellString(reader, 3),
+                            bgImageFileName = GetCellString(reader, 4),
+                            bgMusicFileName = GetCellString(reader, 5),
+                            // data.characterNum = reader.IsDBNull(6) ?
+                            // 0 :
+                            // int.TryParse(reader.GetValue(6)?.ToString(), out num) ? num : Constants.DEFAULT_UNEXiST_NUMBER;
+                            characterCommands = new List<CharacterCommand>()
+                        };
+                        var raw = GetCellString(reader, 6);
+                        if (!string.IsNullOrEmpty(raw))
+                        {
+                            var parts = raw.Split(';', System.StringSplitOptions.RemoveEmptyEntries);
+                            foreach (var _command in parts)
+                            {
+                                var block = _command.Trim();
+                                if (string.IsNullOrEmpty(block))
+                                {
+                                    Debug.Log("Empty command block found, skipping.");
+                                    continue; // 跳过空的指令块
+                                }
+                                var fields = block.Split('\n', System.StringSplitOptions.RemoveEmptyEntries);
+                                if (fields[0].Trim().StartsWith(Constants.CHARACTERCOMMANDS))
+                                {
+                                    continue;
+                                }
+                                if (fields.Length < 2)
+                                    {
+                                        Debug.Log("Invalid command block format, skipping: " + block);
+                                        continue; // 跳过格式不正确的指令块
+                                    }
+                                var cmd = new CharacterCommand
+                                {
+                                    characterID = fields[0].Trim(),
+                                    characterAction = fields[1].Trim()
+                                };
+                                if (cmd.characterAction != Constants.CHARACTERACTION_DISAPPEAR)
+                                {
+                                    if (fields.Length < 4)
+                                    {
+                                        Debug.Log("Incomplete command block, missing position or emotion: " + block);
+                                        continue; // 跳过不完整的指令块
+                                    }
+                                    var third = fields[2].Trim();
+                                    var fourth = fields[3].Trim();
+
+                                    if (float.TryParse(third, out float positionX))
+                                    {
+                                        cmd.positionX = positionX;
+                                        cmd.characterEmotion = string.IsNullOrWhiteSpace(fourth) ? null : fourth;
+                                    }
+                                    else if (float.TryParse(fourth, out positionX))
+                                    {
+                                        cmd.characterEmotion = string.IsNullOrWhiteSpace(third) ? null : third;
+                                        cmd.positionX = positionX;
+                                    }
+                                    else
+                                    {
+                                        cmd.characterEmotion = null;
+                                        cmd.positionX = 0f;
+                                    }
+                                }
+                                data.characterCommands.Add(cmd);
+
+                            }
+                        }
                         excelData.Add(data);
                     }
                 } while (reader.NextResult());
