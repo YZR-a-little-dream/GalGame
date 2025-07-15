@@ -22,7 +22,7 @@ public class SingletonMonoBase<T> : MonoBehaviour where T : MonoBehaviour
 public class SingletonDontDestory<T> : MonoBehaviour where T : MonoBehaviour
 {
     public static T Instance { get; private set; }
-    private  void Awake()
+    protected virtual  void Awake()
     {
         if (Instance == null)
         {

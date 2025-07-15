@@ -14,6 +14,7 @@ using Unity.VisualScripting;
 using System.Linq;
 using UnityEngine.Rendering.Universal;
 using System.Linq.Expressions;
+using System.Net.NetworkInformation;
 
 public class VNManager : SingletonMonoBase<VNManager>
 {
@@ -48,7 +49,7 @@ public class VNManager : SingletonMonoBase<VNManager>
     private string saveFolderPath;
     private string currentSpeakingContent;  //保存当前对话内容
 
-    private List<ExcelReader.ExcelData> storyData;
+    private List<ExcelData> storyData;
     [SerializeField]private int currentLine;
     private string currentStoryFileName;
     private float currentTypingSpeed = Constants.DEFAULT_TYPING_SPEED;
@@ -91,7 +92,7 @@ public class VNManager : SingletonMonoBase<VNManager>
         GM.currentScene = Constants.GAME_SCENE;
         if (GM.pendingData != null)
         {
-            GameManager.saveData saveData = GM.pendingData;
+            saveData saveData = GM.pendingData;
             GM.pendingData = null;
 
             GM.currentStoryFile = saveData.savedStoryFileName;
@@ -100,13 +101,15 @@ public class VNManager : SingletonMonoBase<VNManager>
 
             saveData.savedHistoryRecords.RemoveLast();      //因为会进行DisplayNextLine()方法
                                                             //所以应该进行移除最后一条记录
-            GM.historyRecords = saveData.savedHistoryRecords;   
+            GM.historyRecords = saveData.savedHistoryRecords;
 
             GM.playerName = saveData.savedPlayerName;
 
             GM.currentBGImg = saveData.savedBGImg;
             GM.currentBGMusic = saveData.savedBGMusic;
-            GM.currentCharacterData = saveData.savedCharacters ?? new List<GameManager.characterSaveData>();
+            GM.currentCharacterData = saveData.savedCharacters ?? new List<characterSaveData>();
+
+            CharacterStateManager.Instance.LoadStates(saveData.savedAffections);
         }
         currentLine = GM.currentLineIndex;
         bottomButtonsAddListener();
@@ -374,7 +377,7 @@ public class VNManager : SingletonMonoBase<VNManager>
         //处理角色动作
         foreach (var cmd in data.characterCommands)
         {
-            Debug.Log($"Processing command: {cmd.characterAction} for character: {cmd.characterID}");
+            //Debug.Log($"Processing command: {cmd.characterAction} for character: {cmd.characterID}");
             if (cmd.characterAction == Constants.CHARACTERACTION_DISAPPEAR)
             {
                 GameManager.Instance.currentCharacterData.
@@ -383,7 +386,7 @@ public class VNManager : SingletonMonoBase<VNManager>
             }
             else
             {
-                var state = new GameManager.characterSaveData
+                var state = new characterSaveData
                 {
                     characterID = cmd.characterID,
                     characterEmotion = cmd.characterEmotion,
@@ -391,7 +394,7 @@ public class VNManager : SingletonMonoBase<VNManager>
                 };
 
                 if (GameManager.Instance.currentCharacterData == null)
-                    GameManager.Instance.currentCharacterData = new List<GameManager.characterSaveData>();
+                    GameManager.Instance.currentCharacterData = new List<characterSaveData>();
     
                 GameManager.Instance.currentCharacterData.
                      RemoveAll(c => c.characterID == cmd.characterID);
@@ -486,17 +489,105 @@ public class VNManager : SingletonMonoBase<VNManager>
     #region  show choice panel
     private void showChocies()
     {
-        var data = storyData[currentLine];
-        var choice = data.speakingContent
-                        .Split(Constants.SHOICEDELIMITER)
-                        .Select(s => s.Trim())
-                        .ToList();
-        var actions = data.avatorImageFileName
-                        .Split(Constants.SHOICEDELIMITER)
-                        .Select(s => s.Trim())
-                        .ToList();
-        ChoiceManager.Instance.showChoices(choice, actions,handleChoice);
+        List<ChoiceOption> choices = ParseChoices();
+        foreach (var opt in choices)
+        {
+            Debug.Log($"选项：{opt.text},目标：{opt.nextStoryFileName},变化:{string.Join(",",opt.changes.Select(c => $"{c.characterID}:{c.delta}"))},条件:{string.Join(",",opt.conditions.Select(c => $"{c.characterID}:{c.minValue}--{c.maxValue}"))}");
+        }
+        ChoiceManager.Instance.showChoices(choices,handleChoice);
     }
+
+    private List<ChoiceOption> ParseChoices()
+    {
+        var data = storyData[currentLine];
+        string[] choiceTexts = LM.GetSpeakingContent(data)
+                            .Split(Constants.SHOICEDELIMITER)
+                            .Select(s => s.Trim())
+                            .ToArray();
+        string[] targetFiles = data.avatorImageFileName
+                            .Split(Constants.SHOICEDELIMITER)
+                            .Select(s => s.Trim())
+                            .ToArray();
+        string[] changes = data.vocalAudioFileName
+                            .Split(Constants.SHOICEDELIMITER)
+                            .Select(s => s.Trim())
+                            .ToArray();
+        string[] coditions = data.bgImageFileName
+                            .Split(Constants.SHOICEDELIMITER)
+                            .Select(s => s.Trim())
+                            .ToArray();
+
+        List<ChoiceOption> choices = new List<ChoiceOption>();
+        int choiceCount = choiceTexts.Length;
+
+        for (int i = 0; i < choiceCount; i++)
+        {
+            ChoiceOption opt = new ChoiceOption
+            {
+                text = choiceTexts.ElementAtOrDefault(i) ?? "",
+                nextStoryFileName = targetFiles.ElementAtOrDefault(i) ?? "",
+                changes = ParseChanges(changes.ElementAtOrDefault(i) ?? ""),
+                conditions = ParseConditions(coditions.ElementAtOrDefault(i) ?? "")
+            };
+            choices.Add(opt);
+        }
+        return choices;
+    }
+
+    //Parse "Alice:+10;Bob:-5" => List<AffectionChange>
+    private List<AffectionChange> ParseChanges(string raw)
+    {
+        List<AffectionChange> list = new List<AffectionChange>();
+        if (string.IsNullOrEmpty(raw)) return list;
+
+        //Trim只会删除前后的空白  而StringSplitOptions.RemoveEmptyEntries把空白都去掉
+        foreach (string part in raw.Split(";", StringSplitOptions.RemoveEmptyEntries))
+        {
+            string[] Affectiondata = part.Split(":", StringSplitOptions.RemoveEmptyEntries);
+            if (Affectiondata.Length != 2) continue;
+
+            if (int.TryParse(Affectiondata[1], out int delta))
+            {
+                list.Add(new AffectionChange
+                {
+                    characterID = Affectiondata[0].Trim(),
+                    delta = delta
+                });
+            }
+        }
+        return list;
+    }
+
+    
+    //Parse "Anni:0,100;Bob:-50,50" => List<affectionCondition>
+    private List<AffectionCondition> ParseConditions(string raw)
+    {
+        List<AffectionCondition> list = new List<AffectionCondition>();
+        if (string.IsNullOrEmpty(raw)) return list;
+
+        //Trim只会删除前后的空白  而StringSplitOptions.RemoveEmptyEntries把空白都去掉
+        foreach (string part in raw.Split(";", StringSplitOptions.RemoveEmptyEntries))
+        {
+            string[] Conditiondata = part.Split(":", StringSplitOptions.RemoveEmptyEntries);
+            if (Conditiondata.Length != 2) continue;
+
+            string id = Conditiondata[0].Trim();
+            string[] nums = Conditiondata[1].Split(",", StringSplitOptions.RemoveEmptyEntries);
+            if (nums.Length != 2) continue;
+
+            if (int.TryParse(nums[0], out int min) && int.TryParse(nums[1], out int max))
+            {
+                list.Add(new AffectionCondition
+                {
+                    characterID = id,
+                    minValue = min,
+                    maxValue = max
+                });
+            }        
+        }
+        return list;
+    }
+
 
     private void handleChoice(string selectedChoice)
     {
@@ -504,6 +595,7 @@ public class VNManager : SingletonMonoBase<VNManager>
         LoadStory(selectedChoice);
         DisplayNextLine();
     }
+
 
     private void LoadMiniGame()
     {
@@ -834,10 +926,10 @@ public class VNManager : SingletonMonoBase<VNManager>
         OpenGameUI();
 
         GameManager gm = GameManager.Instance;
-        GameManager.Instance.pendingData = new GameManager.saveData
+        GameManager.Instance.pendingData = new saveData
         {
             savedStoryFileName = currentStoryFileName,
-            savedLine = currentLine,                   
+            savedLine = currentLine,
 
             savedScreenshotData = screenshot.EncodeToPNG(),
             savedHistoryRecords = gm.historyRecords,
@@ -845,6 +937,7 @@ public class VNManager : SingletonMonoBase<VNManager>
             savedBGImg = gm.currentBGImg,
             savedBGMusic = gm.currentBGMusic,
             savedCharacters = gm.currentCharacterData,
+            savedAffections = CharacterStateManager.Instance.Dumpstates()
         };
     }
 

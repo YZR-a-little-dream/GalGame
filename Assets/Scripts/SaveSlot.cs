@@ -50,7 +50,7 @@ public class SaveSlot : MonoBehaviour
         }
 
         string json = File.ReadAllText(path);
-        GameManager.saveData data = JsonConvert.DeserializeObject<GameManager.saveData>(json);
+        saveData data = JsonConvert.DeserializeObject<saveData>(json);
 
         if (data.savedScreenshotData != null)
         {

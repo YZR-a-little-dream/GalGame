@@ -70,7 +70,7 @@ public static class LM
         return LocalizationManager.Instance.GetLocalizedValue(curlanguageIndex);
     }
 
-    public static string GetSpeakerName(ExcelReader.ExcelData data)
+    public static string GetSpeakerName(ExcelData data)
     {
         string currentSpeakName = string.Empty;
         switch (GameManager.Instance.currentLanguageIndex)
@@ -91,7 +91,7 @@ public static class LM
         return currentSpeakName;
     }
 
-    public static string GetSpeakingContent(ExcelReader.ExcelData data)
+    public static string GetSpeakingContent(ExcelData data)
     {
         string currentSpeekingContent = string.Empty;
         switch (GameManager.Instance.currentLanguageIndex)

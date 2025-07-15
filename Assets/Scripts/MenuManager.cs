@@ -94,6 +94,8 @@ public class MenuManager : SingletonMonoBase<MenuManager>
         
         //FIXME: 历史记录
         GameManager.Instance.historyRecords = new LinkedList<string>();
+        //重置好感度
+        CharacterStateManager.Instance.ResetAffectin();
 
         //FIXME:  直接进入游戏画面而不是输入玩家名字
         SceneManager.LoadScene(Constants.GAME_SCENE);
