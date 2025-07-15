@@ -8,7 +8,7 @@ using UnityEngine;
 
 public class GameManager : SingletonDontDestory<GameManager>
 {
-    //FIXME:玩家姓名
+    //FIXME:默认玩家姓名
     public string playerName = "我是玩家";
     public string currentScene;
     public string currentStoryFile;

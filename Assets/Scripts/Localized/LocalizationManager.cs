@@ -69,4 +69,52 @@ public static class LM
     {
         return LocalizationManager.Instance.GetLocalizedValue(curlanguageIndex);
     }
+
+    public static string GetSpeakerName(ExcelReader.ExcelData data)
+    {
+        string currentSpeakName = string.Empty;
+        switch (GameManager.Instance.currentLanguageIndex)
+        {
+            case 0:
+                currentSpeakName = ReplaceName(data.speakerName);
+                break;
+            case 1:
+                currentSpeakName = ReplaceName(data.englishName);
+                break;
+            case 2:
+                currentSpeakName = ReplaceName(data.japaneseName);
+                break;
+            default:
+                Debug.Log(GameManager.Instance.currentLanguageIndex);
+                break;
+        }
+        return currentSpeakName;
+    }
+
+    public static string GetSpeakingContent(ExcelReader.ExcelData data)
+    {
+        string currentSpeekingContent = string.Empty;
+        switch (GameManager.Instance.currentLanguageIndex)
+        {
+            case 0:
+                currentSpeekingContent = ReplaceName(data.speakingContent);
+                break;
+            case 1:
+                currentSpeekingContent = ReplaceName(data.englishContent);
+                break;
+            case 2:
+                currentSpeekingContent = ReplaceName(data.japaneseContent);
+                break;
+            default:
+                Debug.Log(GameManager.Instance.currentLanguageIndex);
+                break;
+        }
+        return currentSpeekingContent;
+    }
+
+    public static string ReplaceName(string Content)
+    {
+        //string类里提供好的
+        return Content.Replace(Constants.NAME_PLACEHOLDER, GameManager.Instance.playerName);
+    }
 }

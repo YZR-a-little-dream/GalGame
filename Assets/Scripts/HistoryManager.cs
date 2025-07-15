@@ -40,7 +40,7 @@ public class HistoryManager : SingletonMonoBase<HistoryManager>
         //显示新的历史记录
         while (currentNode != null)
         {
-            //FIXME: 本地化可能存在问题 p30   03:59
+            //FIXME: 历史记录的本地化问题？？？
             AddHistoryItem(currentNode.Value);
             currentNode = currentNode.Previous;
         }

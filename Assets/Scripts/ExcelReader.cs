@@ -30,6 +30,11 @@ public class ExcelReader : MonoBehaviour
 
         public List<CharacterCommand> characterCommands = new(); //角色指令列表
 
+        public string englishName;
+        public string englishContent;
+        public string japaneseName;
+        public string japaneseContent;
+
     }
 
     public static List<ExcelData> ReadExcel(string filepath)
@@ -59,7 +64,11 @@ public class ExcelReader : MonoBehaviour
                             // data.characterNum = reader.IsDBNull(6) ?
                             // 0 :
                             // int.TryParse(reader.GetValue(6)?.ToString(), out num) ? num : Constants.DEFAULT_UNEXiST_NUMBER;
-                            characterCommands = new List<CharacterCommand>()
+                            characterCommands = new List<CharacterCommand>(),
+                            englishName = GetCellString(reader, 7),
+                            englishContent = GetCellString(reader, 8),
+                            japaneseName = GetCellString(reader, 9),
+                            japaneseContent = GetCellString(reader,10)
                         };
                         var raw = GetCellString(reader, 6);
                         if (!string.IsNullOrEmpty(raw))

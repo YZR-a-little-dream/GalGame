@@ -15,7 +15,7 @@ using System.Linq;
 using UnityEngine.Rendering.Universal;
 using System.Linq.Expressions;
 
-public class VNManager : SingletonDontDestory<VNManager>
+public class VNManager : SingletonMonoBase<VNManager>
 {
     //public CharacterImgController characterImgController;
 
@@ -34,7 +34,7 @@ public class VNManager : SingletonDontDestory<VNManager>
     public Image backgroundImage;           //背景图片
     //public AudioSource backgroundMusic;     //背景音乐
 
-    //public Image[] characterImageArr;            //角色立绘列表  //TODO:@1 角色立绘修改
+    //public Image[] characterImageArr;            //角色立绘列表  
 
     //右下角的控制按钮
     public GameObject bottomButtonsPanel;
@@ -195,7 +195,7 @@ public class VNManager : SingletonDontDestory<VNManager>
     //     // if(isLoad)
     //     // {
     //     //     RecoverLastBgAndCharcter();
-    //     //     DisplayNextLine();          //FIXME：自己修改部分可能会出现问题，完成读取文本内容
+    //     //     DisplayNextLine();          //自己修改部分可能会出现问题，完成读取文本内容
     //     //     isLoad = false;
     //     // }
     //     RecoverLastBGAndCharacter();
@@ -223,11 +223,11 @@ public class VNManager : SingletonDontDestory<VNManager>
     {
         currentStoryFileName = fileName;
         //string path = Constants.STORY_PATH + fileName + Constants.DEFAULT_FILE_EXTENSION;
-        //FIXME: @3 本地化语言问题
+
         string storyFilepath = Path.Combine(Application.streamingAssetsPath,
-                                    Constants.LANGUAGE_PATH,
-                                    LocalizationManager.Instance.currentLanguage,
+                                    Constants.STORY_PATH,
                                     fileName + Constants.STORY_FILE_EXTENSION);
+
         storyData = ExcelReader.ReadExcel(storyFilepath);
         
         if(storyData == null || storyData.Count == 0)
@@ -283,7 +283,7 @@ public class VNManager : SingletonDontDestory<VNManager>
             if (storyData[currentLine].speakerName == Constants.END_OF_STORY)
             {
                 GameManager.Instance.hasStarted = false;
-                //FIXME:演示场景：SceneManager.LoadScene(Constants.CREDITS_SCENE);
+                //FIXME:跳过致谢场景：SceneManager.LoadScene(Constants.CREDITS_SCENE);
                 SceneManager.LoadScene(Constants.MENU_SCENE);
             }
 
@@ -327,10 +327,9 @@ public class VNManager : SingletonDontDestory<VNManager>
     {
         GameManager.Instance.currentLineIndex = currentLine;
         var data = storyData[currentLine];
-        //FIXME: ？ p29 10:47 本地化问题？？？
         string playerName = GameManager.Instance.playerName;
-        speakerName.text = data.speakerName.Replace(Constants.NAME_PLACEHOLDER,playerName);
-        currentSpeakingContent = data.speakingContent.Replace(Constants.NAME_PLACEHOLDER,playerName);
+        speakerName.text = LM.GetSpeakerName(data);
+        currentSpeakingContent = LM.GetSpeakingContent(data);
 
         typeWriterEffect.StartTyping(currentSpeakingContent,currentTypingSpeed);
         
@@ -439,7 +438,7 @@ public class VNManager : SingletonDontDestory<VNManager>
         //         PlayBackgroundMusic(data.lastBgMusic);
         //     }
 
-        //TODO: 角色立绘        
+        // 角色立绘        
         // if (GameManager.Instance.curCharacterName_ActionDic != null)
         //     {
         //         foreach (var ChracterImg_Pos in GameManager.Instance.curCharacterName_ActionDic)
@@ -456,7 +455,7 @@ public class VNManager : SingletonDontDestory<VNManager>
         //         }
         //     }
 
-        CharacterManager.Instance.ClrarAll();
+        CharacterManager.Instance.ClearAll();
         Debug.Log(GameManager.Instance.currentCharacterData);
         if (GameManager.Instance.currentCharacterData != null)
         {
@@ -544,7 +543,7 @@ public class VNManager : SingletonDontDestory<VNManager>
         }
     }
     
-    //TODO：立绘更新
+    //立绘更新
     private void UpdateCharacterImage(string Action, string imageFileName, Image characterImage)
     {
         if (Action.StartsWith(Constants.CHARACTERACTION_APPEARAT))

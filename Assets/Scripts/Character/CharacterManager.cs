@@ -59,7 +59,7 @@ public class CharacterManager : SingletonMonoBase<CharacterManager>
         }
     }
 
-    public void ClrarAll()
+    public void ClearAll()
     {
         foreach (KeyValuePair<string, CharacterDisplay> _activeDisplay in activeDisplays)
         {

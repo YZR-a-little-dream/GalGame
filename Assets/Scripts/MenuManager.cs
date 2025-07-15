@@ -203,7 +203,7 @@ public class MenuManager : SingletonMonoBase<MenuManager>
         //         break;
         // }
         TextMeshProUGUI languageButtonTMP = languagebutton.GetComponentInChildren<TextMeshProUGUI>();
-        languageButtonTMP.text = LocalizationManager.Instance.GetLocalizedValue(Constants.LANGUAGES[currentLanguageIndex]);       
+        languageButtonTMP.text = LM.GLV(Constants.LANGUAGES[currentLanguageIndex]);       
     }
 
     // private void ShowGamePanel()

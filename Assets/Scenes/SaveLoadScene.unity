@@ -2461,6 +2461,8 @@ GameObject:
   - component: {fileID: 1920000794}
   - component: {fileID: 1920000796}
   - component: {fileID: 1920000795}
+  - component: {fileID: 1920000797}
+  - component: {fileID: 1920000798}
   m_Layer: 0
   m_Name: ConfirmText
   m_TagString: Untagged
@@ -2584,6 +2586,32 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1920000793}
   m_CullTransparentMesh: 1
+--- !u!114 &1920000797
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1920000793}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4ea1bf893e09ccf4cb583c383d057b96, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  key: override_sav
+--- !u!114 &1920000798
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1920000793}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4ea1bf893e09ccf4cb583c383d057b96, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  key: delete_sav
 --- !u!1001 &1924588525
 PrefabInstance:
   m_ObjectHideFlags: 0

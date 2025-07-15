@@ -173,7 +173,7 @@ public class SaveLoadManager : SingletonMonoBase<SaveLoadManager>
     //         }
     //         if (saveData.savedHistoryRecords.Last != null)
     //         {
-    //             //FIXME: save and load 本地化
+    //             //save and load 本地化
     //             TextMeshProUGUI[] textComponents = slotBtn.GetComponentsInChildren<TextMeshProUGUI>();
     //             textComponents[0].text = saveData.savedHistoryRecords.Last.Value;
     //             textComponents[1].text = File.GetLastWriteTime(savePath).ToString("G");

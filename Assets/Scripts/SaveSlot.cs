@@ -45,8 +45,7 @@ public class SaveSlot : MonoBehaviour
         if (!hasFile)
         {
             topText.text = string.Empty;
-            //FIXME :本地化
-            bottomText.text = (slotIndex + 1) + Constants.COLON + Constants.Empty_SLOT;
+            bottomText.text = (slotIndex + 1) + Constants.COLON + LM.GLV(Constants.Empty_SLOT);
             return;
         }
 

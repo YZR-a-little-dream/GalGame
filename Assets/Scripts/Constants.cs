@@ -150,8 +150,8 @@ public class Constants : MonoBehaviour
     public static float DEFAULT_FAST_MULTIPLIER = 3f;
 
     public static char SHOICEDELIMITER = '\n';
-    public static string CONFIRM_COVER_SAVE_FILE = "确认覆盖现有存档吗？";
-    public static string CONFIRM_DELETE_SAVE_FILE = "确认删除存档吗？";
+    public static string CONFIRM_COVER_SAVE_FILE = "override_sav";
+    public static string CONFIRM_DELETE_SAVE_FILE = "delete_sav";
 
     public static int QUICK_SAVE_SLOT = 0; // 快速保存槽位
     public static string CHARACTERCOMMANDS = "CharacterCommands"; // 角色指令块标识符
